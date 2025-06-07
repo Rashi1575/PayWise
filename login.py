@@ -6,11 +6,12 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def get_db_connection():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="paywise_db",
-        user="rashi",
-        password="pos@rashi05"
+    return psycopg2.connect(
+        host="db.havcrxnjjopcwjhtiytp.supabase.co",
+        database="postgres",
+        user="postgres",
+        password="AdiKpish@00",  # Consider using environment variables!
+        port=5432
     )
     return conn
 
