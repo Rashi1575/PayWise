@@ -8,11 +8,12 @@ def hash_password(password):
 
 # Connect to PostgreSQL
 def get_db_connection():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="paywise_db",
-        user="rashi",
-        password="pos@rashi05"
+    return psycopg2.connect(
+        host="db.havcrxnjjopcwjhtiytp.supabase.co",
+        database="postgres",
+        user="postgres",
+        password="AdiKpish@00",  # Consider using environment variables!
+        port=5432
     )
     return conn
 
@@ -69,7 +70,3 @@ def register_user(username, password, confirm_password):
         cur.close()
         conn.close()
 
-# Example usage
-# if _name_ == "_main_":
-#     create_users_table()
-#     register_user("testuser", "mypassword", "mypassword")
