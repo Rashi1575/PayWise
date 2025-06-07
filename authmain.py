@@ -1,11 +1,31 @@
 import signup
 import login
 import psycopg2
+import os
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env file
+
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=os.getenv("DB_PORT",5432)
+    )
+
+# Example usage in your code:
+conn = get_db_connection()
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM users;")
+print(cursor.fetchall())
 
 def get_user_input(prompt):
     return input(prompt).strip()
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     while True:
         print("\n1. Register")
         print("2. Login")
@@ -45,10 +65,3 @@ if __name__ == "_main_":
 
         else:
             print("Invalid choice. Please try again.")
-        conn = psycopg2.connect(
-            host="db.havcrxnjjopcwjhtiytp.supabase.co",   # Paste Supabase Host here
-            database="paywise_db",     # Database name
-            user="rashi",         # Username
-            password="CodeBlooded00@",  # Your Supabase DB password
-            port=5432                # Port
-        )
