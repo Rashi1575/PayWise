@@ -9,7 +9,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* elegant gradient */
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   background-size: cover;
   height: 100vh;
   display: flex;
@@ -18,11 +18,11 @@ body {
 }
 
 .container {
-  background-color: rgba(255, 255, 255, 0.1); /* translucent glass effect */
+  background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 40px;
-  width: 400px;
+  width: 800px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   color: white;
   text-align: center;
@@ -47,26 +47,31 @@ body {
 }
 
 h2 {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
 input {
   padding: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  align-self: center;
+  width: 500px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 button {
   background-color: #00c9a7;
-  color: white;
+  color: rgb(252, 252, 252);
   border: none;
+  width: 400px;
+  align-self: center;
   padding: 12px 20px;
   border-radius: 25px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
+  margin-bottom: 10px;
 }
 
 button:hover {
@@ -86,18 +91,18 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
 .logo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* margin-bottom: 20px; */
   margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .logo img {
   width: 150px;
   height: auto;
-  /* margin-bottom: 10px; */
 }
 
 .brand-title {
@@ -105,6 +110,7 @@ a:hover {
   margin-top: 10px;
   color: white;
 }
+
 .slogan {
   font-size: 30px;
   color: #0e0000;
@@ -112,21 +118,22 @@ a:hover {
   font-style: italic;
   text-align: center;
 }
+
 .form-links {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-top: 10px;
 }
 
 .form-links a {
-  color: #00c9a7;
+  color: blueviolet;
   font-weight: 500;
-  transition: all 0.3s ease;
   font-size: 14px;
+  transition: all 0.3s ease;
 }
 
 .form-links a:hover {
-  color: #00b494;
   text-decoration: underline;
 }
