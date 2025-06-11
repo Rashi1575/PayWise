@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login System</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <div class="form-box" id="form-box">
-      <!-- Sign In Form -->
-       <!-- Inside <body>, above or inside .form-box -->
-        <div class="logo">
-            <img src="logo.png" alt="PayWise Logo">
-            <h1 class="brand-title">Welcome to PayWise</h1>
-            <p class="slogan">“Smarter Payments, Wiser Spending”</p>
-        </div>
 
+      <!-- Logo Section -->
+      <div class="logo">
+        <img src="logo.png" alt="PayWise Logo" />
+        <h1 class="brand-title">Welcome to PayWise</h1>
+        <p class="slogan">“Smarter Payments, Wiser Spending”</p>
+      </div>
+
+      <!-- Sign In Form -->
       <form id="sign-in-form" class="form active">
         <h2>Sign In</h2>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Password" required>
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
         <button type="submit">Sign In</button>
-        <p><a href="#" id="show-forgot" style="color: blueviolet">Forgot Password?</a></p>
-        <p>Don't have an account? <a href="#" id="show-signup" 
-          style="color: blueviolet; margin-right:50px;">Sign Up</a></p>
+        <div class="form-links">
+          <a href="#" id="show-forgot">Forgot Password?</a>
+          <a href="#" id="show-signup">Sign Up</a>
+        </div>
       </form>
 
       <!-- Sign Up Form -->
       <form id="sign-up-form" class="form">
         <h2>Sign Up</h2>
-        <input type="text" placeholder="Full Name" required>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Password" required>
+        <input type="text" placeholder="Full Name" required />
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
         <button type="submit">Sign Up</button>
         <div class="form-links">
-          <a href="#" id="show-forgot" style="color: blueviolet;">Forgot Password?</a>
-          <span> | </span>
-          <a href="#" id="show-signup" style="color: blueviolet;">Sign Up</a>
+          <a href="#" id="show-forgot">Forgot Password?</a>
+          <a href="#" id="show-signin">Sign In</a>
         </div>
-        <p>Already have an account? <a href="#" id="show-signin" 
-          style="color: blueviolet; margin-right: 50px;">Sign In</a></p>
       </form>
 
       <!-- Forgot Password Form -->
       <form id="forgot-form" class="form">
         <h2>Forgot Password</h2>
-        <input type="email" placeholder="Enter your email" required>
+        <input type="email" placeholder="Enter your email" required />
         <button type="submit">Send Reset Link</button>
-        <p><a href="#" id="back-to-signin" style="color: blueviolet">Back to Sign In</a></p>
+        <div class="form-links">
+          <a href="#" id="back-to-signin">Back to Sign In</a>
+        </div>
       </form>
+
     </div>
   </div>
 
