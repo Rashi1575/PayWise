@@ -35,4 +35,49 @@ document.getElementById("back-to-signin").addEventListener("click", () => {
   signInForm.classList.add("active");
 });
 
-    
+// Handle Signup Submission
+document.getElementById("sign-up-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const inputs = e.target.querySelectorAll("input");
+  const data = {
+    username: inputs[0].value,
+    email: inputs[1].value,
+    password: inputs[2].value,
+    confirm_password: inputs[2].value  // for now, assuming confirm = password
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    alert(result.message);
+  } catch (err) {
+    alert("Error during signup");
+  }
+});
+
+// Handle Login Submission
+document.getElementById("sign-in-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const inputs = e.target.querySelectorAll("input");
+  const data = {
+    username: inputs[0].value,
+    password: inputs[1].value
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    alert(result.message);
+  } catch (err) {
+    alert("Error during login");
+  }
+});
+  
