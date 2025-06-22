@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - PayWise</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- ✅ PayWise logo (clickable) -->
+      <ul>
+        <li style="margin-bottom: 40px;">
+          <a href="#" id="paywiseLink" style="font-size: 30px; font-weight: bold; color: #00c9a7; text-decoration: none;">PayWise</a>
+        </li>
+        <li><a href="#" id="profileLink">Profile</a></li>
+        <li><a href="#">Payment History</a></li>
+        <li><a href="#" id="budgetLink">Budget</a></li>
+        <li><a href="#" id="rewardsLink">Rewards</a></li>
+        <li><a href="#" id="aboutLink">About</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="toggle-container">
+        <label class="switch">
+          <input type="checkbox" id="dark-mode-toggle" />
+          <span class="slider round"></span>
+        </label>
+        <span>Dark Mode</span>
+      </div>
+
+      <h1>Dashboard</h1>
+
+      <!-- Payment Section -->
+      <section class="payment-section" id="payment-section">
+        <h2>Make a Payment</h2>
+        <div class="payment-buttons">
+          <button>Pay via UPI</button>
+          <button>Pay via Net Banking</button>
+        </div>
+      </section>
+
+      <!-- Spending Insights -->
+      <section class="insights-section" id="insights-section">
+        <h2>Spending Insights</h2>
+        <div class="insights-grid">
+          <div class="insight-cards">
+            <div class="card">Total Monthly Spending: ₹12,500</div>
+            <div class="card">Highest Spending Category: Food</div>
+            <div class="card">Suggested Savings: Dining, Entertainment</div>
+          </div>
+
+          <div class="chart-container">
+            <label for="categorySelect">Select Month:</label>
+            <select id="categorySelect">
+              <option value="january">January</option>
+              <option value="february">February</option>
+              <option value="march">March</option>
+              <option value="march">April</option>
+              <option value="march">May</option>
+              <option value="march">June</option>
+              <option value="march">July</option>
+              <option value="march">August</option>
+              <option value="march">September</option>
+              <option value="march">October</option>
+              <option value="march">November</option>
+              <option value="march">December</option>
+
+            </select>
+            <canvas id="expenseChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Budget Section -->
+      <section class="budget-section" id="budget-section" style="display: none;">
+        <h2>Budget</h2>
+        <div class="budget-grid">
+          <div class="budget-box">
+            <h3>Set Budget</h3>
+            <label for="totalBudget">Total Budget:</label>
+            <input type="number" id="totalBudget" placeholder="e.g., 20000" />
+
+            <label for="category">Category:</label>
+            <select id="category">
+              <option>Food and Grocery</option>
+              <option>Transport</option>
+              <option>Entertainment</option>
+              <option>Housing and Bills</option>
+              <option>healthcare</option>
+              <option>Education</option>
+              <option>Shopping</option>
+              <option>Savings</option>
+              <option>Others</option>
+            </select>
+
+            <label for="categoryBudget">Category Budget:</label>
+            <input type="number" id="categoryBudget" placeholder="e.g., 5000" />
+
+            <button id="saveBudget">Save</button>
+          </div>
+
+          <div class="budget-box">
+            <h3>Target Tracker</h3>
+            <p>Need to buy <strong>Lambo</strong></p>
+          </div>
+
+          <div class="budget-box">
+            <h3>Monthly Graph</h3>
+            <canvas id="budgetChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Section -->
+      <section class="profile-section" id="profile-section" style="display: none;">
+        <h2>Profile</h2>
+        <div class="profile-container">
+          <div class="profile-header">
+            <img src="Profilepic.png" alt="Profile Photo" class="profile-pic" />
+            <h3 id="username">JohnDoe123</h3>
+          </div>
+          <div class="profile-fields">
+            <label>Full Name:</label>
+            <input type="text" placeholder="John Doe" />
+
+            <label>Email ID:</label>
+            <input type="email" placeholder="john@example.com" />
+
+            <label>Phone Number:</label>
+            <input type="tel" placeholder="+91-9876543210" />
+
+            <label>Gender:</label>
+            <select>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+              <option>Prefer not to say</option>
+            </select>
+
+            <label>Nationality:</label>
+            <input type="text" placeholder="Indian" />
+
+            <label>Address:</label>
+            <textarea placeholder="123, Street Name, City, Zip"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rewards Section -->
+      <section class="rewards-section" id="rewards-section" style="display: none;">
+        <h2>Rewards</h2>
+
+        <div class="rewards-box">
+          <h3>Top Offers: <span id="highestCategory">Food</span></h3>
+          <ul class="coupon-list">
+            <li>🍕 <strong>Foodie10</strong> – Get 10% off on Zomato orders</li>
+            <li>🛵 <strong>FreeDelivery</strong> – Free delivery on Swiggy above ₹299</li>
+          </ul>
+        </div>
+
+        <div class="rewards-box">
+          <h3>Referral Program</h3>
+          <p>Invite friends and earn cashback! Share this code:</p>
+          <div class="referral-code">PAYWISE123</div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section class="about-section" id="about-section" style="display: none;">
+        <h2>About PayWise</h2>
+
+        <div class="about-box">
+          <p>
+            PayWise is your all-in-one financial companion, helping you manage expenses, track budgets, and unlock exclusive rewards — all in one clean, intuitive interface.
+          </p>
+          <p>
+            Built with simplicity and security in mind, PayWise empowers users to stay in control of their spending and make smarter financial choices.
+          </p>
+        </div>
+
+        <div class="about-box">
+          <p>© 2025 PayWise. All rights reserved.</p>
+          <p>For queries, reach us at: <a href="mailto:codebloodedhackon@gmail.com">codebloodedhackon@gmail.com</a></p>
+        </div>
+      </section>
+
+
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
