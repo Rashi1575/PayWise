@@ -1,48 +1,34 @@
-import hashlib
-import psycopg2
-from otp import send_otp, verify_otp  # Make sure this file exists with those functions
 
-# Hash password securely
+
+import os
+import requests
+import hashlib
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# ✅ Supabase RESTful config
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
+
+headers = {
+    "apikey": SUPABASE_API_KEY,
+    "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# ✅ Hash password
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Get DB connection
-def get_db_connection():
-    return psycopg2.connect(
-        host="db.havcrxnjjopcwjhtiytp.supabase.co",
-        database="postgres",
-        user="postgres",
-        password="AdiKpish@00",  # Use .env for real deployment
-        port=5432
-    )
-
-# Create users table (with email)
-def create_users_table():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            username VARCHAR(255) UNIQUE NOT NULL,
-            email TEXT NOT NULL,
-            password VARCHAR(255) NOT NULL
-        );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-# Check if username exists
+# ✅ Check if username exists in Supabase
 def username_exists(username):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT 1 FROM users WHERE username = %s;", (username,))
-    exists = cur.fetchone() is not None
-    cur.close()
-    conn.close()
-    return exists
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}"
+    res = requests.get(url, headers=headers)
+    return res.status_code == 200 and bool(res.json())
 
-# Final registration flow
+# ✅ Final registration function (logic unchanged, just via Supabase REST)
 def register_user(username, email, password, confirm_password):
     print("📨 Signup called with:")
     print(f"Username: {username}, Email: {email}")
@@ -58,22 +44,22 @@ def register_user(username, email, password, confirm_password):
 
     hashed_password = hash_password(password)
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute(
-            "INSERT INTO users (username, email, password) VALUES (%s, %s, %s);",
-            (username, email, hashed_password)
-        )
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        raise Exception(f"❌ Error registering user: {e}")
-    finally:
-        cur.close()
-        conn.close()
+    # ✅ Insert user via REST API
+    payload = {
+        "username": username,
+        "email": email,
+        "password": hashed_password
+    }
 
+    res = requests.post(
+        f"{SUPABASE_URL}/rest/v1/{TABLE}",
+        headers=headers,
+        json=payload
+    )
 
-# Ensure table exists on first run
-if __name__ == "__main__":
-    create_users_table()  # <- run once
+    if res.status_code == 201:
+        print("✅ User registered successfully.")
+    else:
+        print("❌ Error inserting user:", res.text)
+        raise Exception("Signup failed.")
+
