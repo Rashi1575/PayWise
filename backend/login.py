@@ -1,105 +1,60 @@
-import hashlib
-import psycopg2
-from otp import send_otp, verify_otp  # Make sure your otp.py is configured properly
 
-# Hash password using SHA-256
+import os
+import requests
+import hashlib
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
+
+headers = {
+    "apikey": SUPABASE_API_KEY,
+    "Authorization": f"Bearer {SUPABASE_API_KEY}"
+}
+
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Establish database connection
-def get_db_connection():
-    return psycopg2.connect(
-        host="db.havcrxnjjopcwjhtiytp.supabase.co",
-        database="postgres",
-        user="postgres",
-        password="AdiKpish@00",  # 🔐 Use environment variables in production
-        port=5432
-    )
-
-# Authenticate user login
+# ✅ Authenticate user login
 def authenticate_user(username, password):
     hashed_password = hash_password(password)
-    conn = get_db_connection()
-    cur = conn.cursor()
 
-    try:
-        cur.execute(
-            "SELECT 1 FROM users WHERE username = %s AND password = %s;",
-            (username, hashed_password)
-        )
-        return cur.fetchone() is not None
-    except Exception as e:
-        print(f"Error during authentication: {e}")
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&password=eq.{hashed_password}&select=id"
+    res = requests.get(url, headers=headers)
+
+    if res.status_code == 200 and res.json():
+        return True
+    else:
+        print("❌ Login failed or wrong credentials.")
         return False
-    finally:
-        cur.close()
-        conn.close()
 
-
-#Reset password using OTP verification
-# def reset_password(username, new_password, confirm_password, otp):
-#     if new_password != confirm_password:
-#         raise Exception("Passwords do not match!")
-
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-
-#     try:
-#         cur.execute("SELECT email FROM users WHERE username = %s;", (username,))
-#         result = cur.fetchone()
-#         if result is None:
-#             raise Exception("Username not found!")
-
-#         email = result[0]
-#         # verified, verify_msg = verify_otp(email, otp)
-#         # if not verified:
-#         #     raise Exception("OTP verification failed: " + verify_msg)
-
-#         hashed_password = hash_password(new_password)
-#         cur.execute(
-#             "UPDATE users SET password = %s WHERE username = %s;",
-#             (hashed_password, username)
-#         )
-#         conn.commit()
-
-#     except Exception as e:
-#         conn.rollback()
-#         raise Exception(f"Error resetting password: {e}")
-#     finally:
-#         cur.close()
-#         conn.close()
-
+# ✅ Reset password using OTP (email must already be verified)
 def reset_password(username, new_password, confirm_password, otp):
     if new_password != confirm_password:
         raise Exception("Passwords do not match!")
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+    # Step 1: Get user email from username
+    user_url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&select=email"
+    user_res = requests.get(user_url, headers=headers)
 
-    try:
-        cur.execute("SELECT email FROM users WHERE username = %s;", (username,))
-        result = cur.fetchone()
-        if result is None:
-            raise Exception("Username not found!")
+    if user_res.status_code != 200 or not user_res.json():
+        raise Exception("Username not found!")
 
-        email = result[0]
+    email = user_res.json()[0]['email']
 
-        # ❌ DO NOT verify OTP again here
+    # Step 2: ✅ Do NOT re-verify OTP (already verified before calling this)
 
-        hashed_password = hash_password(new_password)
-        cur.execute(
-            "UPDATE users SET password = %s WHERE username = %s;",
-            (hashed_password, username)
-        )
-        conn.commit()
+    # Step 3: Update password
+    hashed = hash_password(new_password)
+    update_url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}"
+    update_res = requests.patch(update_url, headers=headers | {"Content-Type": "application/json"}, json={"password": hashed})
 
-    except Exception as e:
-        conn.rollback()
-        raise Exception(f"Error resetting password: {e}")
-    finally:
-        cur.close()
-        conn.close()
-
-
+    if update_res.status_code in [200, 204]:
+        print("✅ Password reset successful.")
+    else:
+        raise Exception(f"❌ Password reset failed: {update_res.text}")
 
 
