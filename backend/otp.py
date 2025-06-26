@@ -4,8 +4,8 @@ import time
 from email.message import EmailMessage
 
 # Configuration
-SENDER_EMAIL = "singhrashi2005@gmail.com"
-SENDER_PASSWORD = "bgih harj fpot clpa"  # NOT your Gmail password. Use App Password.
+SENDER_EMAIL = "codebloodedhackon@gmail.com"
+SENDER_PASSWORD = "fzlk fnvx undg rcti"
 
 otp_store = {}
 
