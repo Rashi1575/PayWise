@@ -1,254 +1,200 @@
-// ===== Form Elements =====
-const signInForm = document.getElementById("sign-in-form");
-const signUpForm = document.getElementById("sign-up-form");
-const forgotForm = document.getElementById("forgot-form");
-let currentFormType = "";
-let forgotEmail = "";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - PayWise</title>
+  <link rel="stylesheet" href="dashb.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- ✅ PayWise logo (clickable) -->
+      <ul>
+        <li style="margin-bottom: 40px;">
+          <a href="#" id="paywiseLink" style="font-size: 30px; font-weight: bold; color: #00c9a7; text-decoration: none;">PayWise</a>
+        </li>
+        <li><a href="#" id="profileLink">Profile</a></li>
+        <li><a href="#">Payment History</a></li>
+        <li><a href="#" id="budgetLink">Budget</a></li>
+        <li><a href="#" id="rewardsLink">Rewards</a></li>
+        <li><a href="#" id="aboutLink">About</a></li>
+        <li><a href="#" id="logoutLink">Logout</a></li>
+      </ul>
+    </aside>
 
-// ===== Modal Creation (if not already present) =====
-function createModals() {
-  if (!document.getElementById("captchaModal")) {
-    const captchaModal = document.createElement('div');
-    captchaModal.id = 'captchaModal';
-    captchaModal.className = 'modal';
-    captchaModal.style.display = 'none';
-    captchaModal.innerHTML = `
-      <div class="modal-content">
-        <h3>Please verify you're human</h3>
-        <p id="captcha-question">Loading captcha...</p>
-        <input type="text" id="captcha-answer" placeholder="Your answer" />
-        <div class="modal-buttons">
-          <button id="verifyCaptchaBtn">Verify</button>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="toggle-container">
+        <label class="switch">
+          <input type="checkbox" id="dark-mode-toggle" />
+          <span class="slider round"></span>
+        </label>
+        <span>Dark Mode</span>
+      </div>
+
+      <h1>Dashboard</h1>
+
+      <!-- Payment Section -->
+      <section class="payment-section" id="payment-section">
+        <h2>Make a Payment</h2>
+        <div class="payment-buttons">
+          <button>Pay via UPI</button>
+          <button>Pay via Net Banking</button>
         </div>
-      </div>`;
-    document.body.appendChild(captchaModal);
-  }
+      </section>
 
-  if (!document.getElementById("otpModal")) {
-    const otpModal = document.createElement('div');
-    otpModal.id = 'otpModal';
-    otpModal.className = 'modal';
-    otpModal.style.display = 'none';
-    otpModal.innerHTML = `
-      <div class="modal-content">
-        <h3>Enter OTP sent to your email</h3>
-        <input type="text" id="otpInput" placeholder="Enter OTP" />
-        <div class="modal-buttons">
-          <button id="verifyOtpBtn">Verify OTP</button>
+      <!-- Spending Insights -->
+      <section class="insights-section" id="insights-section">
+        <h2>Spending Insights</h2>
+        <div class="insights-grid">
+          <div class="insight-cards">
+            <div class="card">Total Monthly Spending: ₹12,500</div>
+            <div class="card">Highest Spending Category: Food</div>
+            <div class="card">Suggested Savings: Dining, Entertainment</div>
+          </div>
+
+          <div class="chart-container">
+            <label for="categorySelect">Select Month:</label>
+            <select id="categorySelect">
+              <option value="january">January</option>
+              <option value="february">February</option>
+              <option value="march">March</option>
+              <option value="march">April</option>
+              <option value="march">May</option>
+              <option value="march">June</option>
+              <option value="march">July</option>
+              <option value="march">August</option>
+              <option value="march">September</option>
+              <option value="march">October</option>
+              <option value="march">November</option>
+              <option value="march">December</option>
+
+            </select>
+            <canvas id="expenseChart"></canvas>
+          </div>
         </div>
-      </div>`;
-    document.body.appendChild(otpModal);
-  }
-}
+      </section>
 
-// ===== Captcha Logic =====
-function generateCaptcha() {
-  const num1 = Math.floor(Math.random() * 10);
-  const num2 = Math.floor(Math.random() * 10);
-  document.getElementById("captcha-question").textContent = `What is ${num1} + ${num2}?`;
-  return num1 + num2;
-}
+      <!-- Budget Section -->
+      <section class="budget-section" id="budget-section" style="display: none;">
+        <h2>Budget</h2>
+        <div class="budget-grid">
+          <div class="budget-box">
+            <h3>Set Budget</h3>
+            <label for="totalBudget">Total Budget:</label>
+            <input type="number" id="totalBudget" placeholder="e.g., 20000" />
 
-function showCaptchaModal(formType) {
-  currentFormType = formType;
-  const answer = generateCaptcha();
-  document.getElementById("captchaModal").style.display = 'flex';
-  document.getElementById("verifyCaptchaBtn").dataset.answer = answer;
-}
+            <label for="category">Category:</label>
+            <select id="category">
+              <option>Food and Grocery</option>
+              <option>Transport</option>
+              <option>Entertainment</option>
+              <option>Housing and Bills</option>
+              <option>healthcare</option>
+              <option>Education</option>
+              <option>Shopping</option>
+              <option>Savings</option>
+              <option>Others</option>
+            </select>
 
-// ===== Form Switching =====
-function hideAllForms() {
-  signInForm.classList.remove("active");
-  signUpForm.classList.remove("active");
-  forgotForm.classList.remove("active");
-}
+            <label for="categoryBudget">Category Budget:</label>
+            <input type="number" id="categoryBudget" placeholder="e.g., 5000" />
 
-function switchForm(type) {
-  hideAllForms();
-  if (type === 'signin') signInForm.classList.add("active");
-  else if (type === 'signup') signUpForm.classList.add("active");
-  else if (type === 'forgot') forgotForm.classList.add("active");
-}
+            <button id="saveBudget">Save</button>
+          </div>
 
-document.querySelectorAll("#show-signup").forEach(el => el.addEventListener("click", () => switchForm('signup')));
-document.querySelectorAll("#show-signin").forEach(el => el.addEventListener("click", () => switchForm('signin')));
-document.querySelectorAll("#show-forgot").forEach(el => el.addEventListener("click", () => switchForm('forgot')));
-document.getElementById("back-to-signin").addEventListener("click", () => switchForm('signin'));
+          <div class="budget-box">
+            <h3>Target Tracker</h3>
+            <p>Need to buy <strong>Lambo</strong></p>
+          </div>
 
-// ===== Form Submission Events =====
-signInForm.addEventListener("submit", e => {
-  e.preventDefault();
-  showCaptchaModal("signin");
-});
+          <div class="budget-box">
+            <h3>Monthly Graph</h3>
+            <canvas id="budgetChart"></canvas>
+          </div>
+        </div>
+      </section>
 
-signUpForm.addEventListener("submit", e => {
-  e.preventDefault();
-  showCaptchaModal("signup");
-});
+      <!-- Profile Section -->
+      <section class="profile-section" id="profile-section" style="display: none;">
+        <h2>Profile</h2>
+        <div class="profile-container">
+          <div class="profile-header">
+            <img src="Profilepic.png" alt="Profile Photo" class="profile-pic" />
+            <h3 id="username">JohnDoe123</h3>
+          </div>
+          <div class="profile-fields">
+            <label>Full Name:</label>
+            <input type="text" placeholder="John Doe" />
 
-forgotForm.addEventListener("submit", e => {
-  e.preventDefault();
-  const newPass = document.getElementById("new-password").value;
-  const confirmPass = document.getElementById("confirm-new-password").value;
-  if (newPass !== confirmPass) {
-    alert("Passwords don't match!");
-    return;
-  }
-  showCaptchaModal("forgot");
-});
+            <label>Email ID:</label>
+            <input type="email" placeholder="john@example.com" />
 
-// ===== OTP Flow =====
-async function showOtpModal() {
-  let email = "";
+            <label>Phone Number:</label>
+            <input type="tel" placeholder="+91-9876543210" />
 
-  if (currentFormType === "signup") {
-    email = document.getElementById("signup-email").value;
-  } else if (currentFormType === "forgot") {
-    const username = document.getElementById("forgot-username").value;
+            <label>Gender:</label>
+            <select>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+              <option>Prefer not to say</option>
+            </select>
 
-    const res = await fetch("http://localhost:5000/get-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username }),
-    });
+            <label>Nationality:</label>
+            <input type="text" placeholder="Indian" />
 
-    const result = await res.json();
-    if (!result.success) {
-      alert("Email not found for this username.");
-      return;
-    }
+            <label>Address:</label>
+            <textarea placeholder="123, Street Name, City, Zip"></textarea>
+          </div>
+        </div>
+      </section>
 
-    email = result.email;
-    forgotEmail = email;
-  }
+      <!-- Rewards Section -->
+      <section class="rewards-section" id="rewards-section" style="display: none;">
+        <h2>Rewards</h2>
 
-  const response = await fetch("http://localhost:5000/send-otp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
+        <div class="rewards-box">
+          <h3>Top Offers: <span id="highestCategory">Food</span></h3>
+          <ul class="coupon-list">
+            <li>🍕 <strong>Foodie10</strong> – Get 10% off on Zomato orders</li>
+            <li>🛵 <strong>FreeDelivery</strong> – Free delivery on Swiggy above ₹299</li>
+          </ul>
+        </div>
 
-  const data = await response.json();
-  if (data.success) {
-    document.getElementById("otpModal").style.display = 'flex';
-    document.getElementById("otpInput").value = "";
-    console.log("📬 OTP sent to:", email);
-  } else {
-    alert("Failed to send OTP: " + data.message);
-  }
-}
+        <div class="rewards-box">
+          <h3>Referral Program</h3>
+          <p>Invite friends and earn cashback! Share this code:</p>
+          <div class="referral-code">PAYWISE123</div>
+        </div>
+      </section>
 
-async function verifyOtp() {
-  const otp = document.getElementById("otpInput").value;
-  let email = currentFormType === "signup"
-    ? document.getElementById("signup-email").value
-    : forgotEmail;
+      <!-- About Section -->
+      <section class="about-section" id="about-section" style="display: none;">
+        <h2>About PayWise</h2>
 
-  const response = await fetch("http://localhost:5000/verify-otp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp }),
-  });
+        <div class="about-box">
+          <p>
+            PayWise is your all-in-one financial companion, helping you manage expenses, track budgets, and unlock exclusive rewards — all in one clean, intuitive interface.
+          </p>
+          <p>
+            Built with simplicity and security in mind, PayWise empowers users to stay in control of their spending and make smarter financial choices.
+          </p>
+        </div>
 
-  const data = await response.json();
-  if (data.success) {
-    document.getElementById("otpModal").style.display = 'none';
+        <div class="about-box">
+          <p>© 2025 PayWise. All rights reserved.</p>
+          <p>For queries, reach us at: <a href="mailto:codebloodedhackon@gmail.com">codebloodedhackon@gmail.com</a></p>
+        </div>
+      </section>
 
-    if (currentFormType === "signup") {
-      await sendSignupRequest();
-    } else if (currentFormType === "forgot") {
-      await sendForgotPasswordRequest(otp);
-    }
-  } else {
-    alert("Invalid OTP. Try again.");
-  }
-}
 
-// ===== Request Functions =====
-async function sendSignupRequest() {
-  const username = document.getElementById("signup-username").value;
-  const email = document.getElementById("signup-email").value;
-  const password = document.getElementById("signup-password").value;
-  const confirm_password = document.getElementById("signup-confirm-password").value;
+    </main>
+  </div>
 
-  const response = await fetch("http://localhost:5000/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password, confirm_password }),
-  });
-
-  const data = await response.json();
-  if (data.success) {
-    alert("Signup successful! Check your email.");
-    switchForm("signin");
-  } else {
-    alert("Signup failed: " + data.error);
-  }
-}
-
-async function handleLogin() {
-  const username = document.getElementById("signin-username").value;
-  const password = document.getElementById("signin-password").value;
-
-  const response = await fetch("http://localhost:5000/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-
-  const data = await response.json();
-  if (data.success) {
-    localStorage.setItem("loggedIn", "true");  // ✅ store login state
-    alert("Login successful!");
-    window.location.href = "dashboard.html";   // ✅ redirect to dashboard
-  } else {
-    alert("Login failed: " + data.error);
-  }
-}
-
-async function sendForgotPasswordRequest(otp) {
-  const username = document.getElementById("forgot-username").value;
-  const new_password = document.getElementById("new-password").value;
-  const confirm_password = document.getElementById("confirm-new-password").value;
-
-  const response = await fetch("http://localhost:5000/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, new_password, confirm_password, otp }),
-  });
-
-  const data = await response.json();
-  if (data.success) {
-    alert("Password reset successful!");
-    switchForm("signin");
-  } else {
-    alert("Reset failed: " + data.error);
-  }
-}
-
-// ===== Captcha Verification =====
-function verifyCaptcha() {
-  const userAnswer = parseInt(document.getElementById("captcha-answer").value);
-  const correctAnswer = parseInt(document.getElementById("verifyCaptchaBtn").dataset.answer);
-
-  if (userAnswer === correctAnswer) {
-    document.getElementById("captchaModal").style.display = 'none';
-
-    if (currentFormType === "signin") {
-      handleLogin();
-    } else {
-      showOtpModal(); // ✅ call OTP modal after captcha
-    }
-  } else {
-    alert("Incorrect captcha. Try again.");
-    generateCaptcha();
-  }
-}
-
-// ===== Init =====
-createModals();
-document.addEventListener("click", (e) => {
-  if (e.target.id === "verifyCaptchaBtn") verifyCaptcha();
-  if (e.target.id === "verifyOtpBtn") verifyOtp();
-});
-switchForm("signin");
+  <script src="dashb.js"></script>
+</body>
+</html>
