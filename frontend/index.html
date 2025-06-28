@@ -20,8 +20,8 @@
       <!-- Sign In Form -->
       <form id="sign-in-form" class="form active">
         <h2>Sign In</h2>
-        <input type="text" id="signin-username" placeholder="Username" required />
-        <input type="password" id="signin-password" placeholder="Password" required />
+        <input id="signin-username" type="text" placeholder="Username" required />
+        <input id="signin-password" type="password" placeholder="Password" required />
         <button type="submit">Sign In</button>
         <div class="form-links">
           <a href="#" id="show-forgot">Forgot Password?</a>
@@ -32,10 +32,10 @@
       <!-- Sign Up Form -->
       <form id="sign-up-form" class="form">
         <h2>Sign Up</h2>
-        <input type="text" id="signup-username" placeholder="Username" required />
-        <input type="email" id="signup-email" placeholder="Email" required />
-        <input type="password" id="signup-password" placeholder="Password" required />
-        <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required />
+        <input id="signup-username" type="text" placeholder="Username" required />
+        <input id="signup-email" type="email" placeholder="Email" required />
+        <input id="signup-password" type="password" placeholder="Password" required />
+        <input id="signup-confirm-password" type="password" placeholder="Confirm Password" required />
         <button type="submit">Sign Up</button>
         <div class="form-links">
           <a href="#" id="show-forgot">Forgot Password?</a>
@@ -46,9 +46,9 @@
       <!-- Forgot Password Form -->
       <form id="forgot-form" class="form">
         <h2>Forgot Password</h2>
-        <input type="text" id="forgot-username" placeholder="Username" required />
-        <input type="password" id="new-password" placeholder="New Password" required />
-        <input type="password" id="confirm-new-password" placeholder="Confirm New Password" required />
+        <input id="forgot-username" type="text" placeholder="Username" required />
+        <input id="new-password" type="password" placeholder="New Password" required />
+        <input id="confirm-new-password" type="password" placeholder="Confirm New Password" required />
         <button type="submit">Reset Password</button>
         <div class="form-links">
           <a href="#" id="back-to-signin">Back to Sign In</a>
@@ -58,7 +58,28 @@
     </div>
   </div>
 
-  <!-- ✅ No duplicate modals here: handled by JS -->
+  <!-- Add these modal divs right before the script tag -->
+  <div id="captchaModal" class="modal">
+    <div class="modal-content">
+      <h3>Please verify you're human</h3>
+      <p id="captcha-question">Loading captcha...</p>
+      <input type="text" id="captcha-answer" placeholder="Your answer" />
+      <div class="modal-buttons">
+        <button id="verifyCaptchaBtn">Verify</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="otpModal" class="modal">
+    <div class="modal-content">
+      <h3>Enter OTP sent to your email</h3>
+      <input type="text" id="otpInput" placeholder="Enter OTP" />
+      <div class="modal-buttons">
+        <button id="verifyOtpBtn">Verify OTP</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
