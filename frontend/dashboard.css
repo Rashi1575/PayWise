@@ -121,7 +121,6 @@ body {
   flex-wrap: wrap;
   gap: 30px;
   margin-top: 10px;
-  align-items: flex-start;
 }
 
 .insight-cards {
@@ -139,68 +138,12 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Chart container with relative position */
 .chart-container {
   flex: 1;
-  min-width: 0;
+  min-width: 300px;
   max-width: 500px;
-  height: auto;
-  position: relative;
+  height: 300px;
 }
-
-/* Top-right dropdown inside chart */
-.chart-header {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
-}
-
-.chart-header select {
-  margin: 10px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-/* Chart canvas shifts up */
-#spendingChart {
-  margin-top: 20px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Legend below the chart */
-#chart-legend ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  font-size: 14px;
-}
-
-#chart-legend li {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.dot.food { background-color: #00bfa5; }
-.dot.transport { background-color: #00acc1; }
-.dot.utilities { background-color: #ffa726; }
-.dot.shopping { background-color: #ef5350; }
-.dot.others { background-color: #ab47bc; }
 
 canvas {
   max-width: 100%;
@@ -532,69 +475,4 @@ body.dark-mode .about-box {
 
 .about-box a:hover {
   text-decoration: underline;
-}
-
-/* For Payment History */
-/* Payment History Section */
-#payment-history-section {
-  padding: 20px;
-  font-family: 'Segoe UI', sans-serif;
-  display: none;
-}
-
-#payment-history-section table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* 🌞 Light Mode */
-#payment-history-section.light-mode {
-  background-color: #f9ffff;
-  color: #000;
-}
-
-#payment-history-section.light-mode table {
-  background-color: #e0f7f4;
-  color: #000;
-}
-
-#payment-history-section.light-mode th {
-  background-color: #b2ebe4;
-}
-
-/* 🌚 Dark Mode */
-#payment-history-section.dark-mode {
-  background-color: #121e1e;
-  color: #f1f1f1;
-}
-
-#payment-history-section.dark-mode table {
-  background-color: #1f2c2c;
-  color: #f1f1f1;
-}
-
-#payment-history-section.dark-mode th {
-  background-color: #304b4b;
-}
-
-/* Common Styles */
-#payment-history-section th,
-#payment-history-section td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #ccc;
-}
-
-#payment-history-section select,
-#payment-history-section button {
-  padding: 6px 12px;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
 }
