@@ -1,47 +1,44 @@
-// ====== Form Elements ======
+// Get Form Elements
 const signInForm = document.getElementById("sign-in-form");
 const signUpForm = document.getElementById("sign-up-form");
 const forgotForm = document.getElementById("forgot-form");
+let forgotEmail = "";  // Store email used in forgot flow
 
 let currentFormType = "";
-let forgotEmail = "";
 
-// ====== Modal Creation (if not already present) ======
+// Dynamically create modals on page load
 function createModals() {
-  if (!document.getElementById("captchaModal")) {
-    const captchaModal = document.createElement('div');
-    captchaModal.id = 'captchaModal';
-    captchaModal.className = 'modal';
-    captchaModal.style.display = 'none';
-    captchaModal.innerHTML = `
-      <div class="modal-content">
-        <h2>Please verify you're human</h2>
-        <p id="captcha-question">Loading captcha...</p>
-        <input type="text" id="captcha-answer" placeholder="Your answer" />
+  const captchaModal = document.createElement('div');
+  captchaModal.id = 'captchaModal';
+  captchaModal.className = 'modal';
+  captchaModal.style.display = 'none';
+  captchaModal.innerHTML = `
+    <div class="modal-content">
+      <h3>Please verify you're human</h3>
+      <p id="captcha-question">Loading captcha...</p>
+      <input type="text" id="captcha-answer" placeholder="Your answer" />
+      <div class="modal-buttons">
         <button id="verifyCaptchaBtn">Verify</button>
       </div>
-    `;
-    document.body.appendChild(captchaModal);
-  }
+    </div>`;
 
-  if (!document.getElementById("otpModal")) {
-    const otpModal = document.createElement('div');
-    otpModal.id = 'otpModal';
-    otpModal.className = 'modal';
-    otpModal.style.display = 'none';
-    otpModal.innerHTML = `
-      <div class="modal-content">
-        <h2>Enter OTP sent to your email</h2>
-        <input type="text" id="otp-input" placeholder="Enter OTP" />
+  const otpModal = document.createElement('div');
+  otpModal.id = 'otpModal';
+  otpModal.className = 'modal';
+  otpModal.style.display = 'none';
+  otpModal.innerHTML = `
+    <div class="modal-content">
+      <h3>Enter OTP sent to your email</h3>
+      <input type="text" id="otpInput" placeholder="Enter OTP" />
+      <div class="modal-buttons">
         <button id="verifyOtpBtn">Verify OTP</button>
       </div>
-    `;
-    document.body.appendChild(otpModal);
-  }
-}
-createModals();
+    </div>`;
 
-// ====== Captcha Logic ======
+  document.body.appendChild(captchaModal);
+  document.body.appendChild(otpModal);
+}
+
 function generateCaptcha() {
   const num1 = Math.floor(Math.random() * 10);
   const num2 = Math.floor(Math.random() * 10);
@@ -52,41 +49,32 @@ function generateCaptcha() {
 function showCaptchaModal(formType) {
   currentFormType = formType;
   const answer = generateCaptcha();
-  document.getElementById("captchaModal").style.display = "flex";
+  document.getElementById("captchaModal").style.display = 'flex';
   document.getElementById("verifyCaptchaBtn").dataset.answer = answer;
 }
 
-document.getElementById("verifyCaptchaBtn").addEventListener("click", () => {
-  const userAns = parseInt(document.getElementById("captcha-answer").value.trim());
-  const correctAns = parseInt(document.getElementById("verifyCaptchaBtn").dataset.answer);
-  if (userAns === correctAns) {
-    document.getElementById("captchaModal").style.display = "none";
-    showOtpModal();
-  } else {
-    alert("Incorrect captcha. Try again.");
-  }
-});
 
-// ====== Form Switching ======
+
 function hideAllForms() {
   signInForm.classList.remove("active");
   signUpForm.classList.remove("active");
   forgotForm.classList.remove("active");
 }
 
-function switchForm(type) {
+// Form Switching
+function switchForm(form) {
   hideAllForms();
-  if (type === "signin") signInForm.classList.add("active");
-  else if (type === "signup") signUpForm.classList.add("active");
-  else if (type === "forgot") forgotForm.classList.add("active");
+  if (form === 'signin') signInForm.classList.add("active");
+  if (form === 'signup') signUpForm.classList.add("active");
+  if (form === 'forgot') forgotForm.classList.add("active");
 }
 
-document.querySelectorAll("#show-signin").forEach(el => el.addEventListener("click", () => switchForm("signin")));
-document.querySelectorAll("#show-signup").forEach(el => el.addEventListener("click", () => switchForm("signup")));
-document.querySelectorAll("#show-forgot").forEach(el => el.addEventListener("click", () => switchForm("forgot")));
-document.getElementById("back-to-signin").addEventListener("click", () => switchForm("signin"));
+document.querySelectorAll("#show-signup").forEach(el => el.addEventListener("click", () => switchForm('signup')));
+document.querySelectorAll("#show-signin").forEach(el => el.addEventListener("click", () => switchForm('signin')));
+document.querySelectorAll("#show-forgot").forEach(el => el.addEventListener("click", () => switchForm('forgot')));
+document.getElementById("back-to-signin").addEventListener("click", () => switchForm('signin'));
 
-// ====== Form Submission Events ======
+// Form Submissions
 signInForm.addEventListener("submit", e => {
   e.preventDefault();
   showCaptchaModal("signin");
@@ -101,14 +89,107 @@ forgotForm.addEventListener("submit", e => {
   e.preventDefault();
   const newPass = document.getElementById("new-password").value;
   const confirmPass = document.getElementById("confirm-new-password").value;
+
   if (newPass !== confirmPass) {
-    alert("Passwords do not match!");
+    alert("Passwords don't match!");
     return;
   }
   showCaptchaModal("forgot");
 });
 
-// ====== OTP Flow ======
+async function sendOtp() {
+  let email = "";
+
+  if (currentFormType === "signup") {
+    email = document.getElementById("signup-email").value;
+  } else if (currentFormType === "forgot") {
+    email = prompt("Enter the email where OTP was sent:");
+  }
+
+  if (!email) {
+    alert("Email is missing.");
+    return;
+  }
+
+  const response = await fetch("http://localhost:5000/send-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    document.getElementById("otpModal").style.display = 'flex';
+    document.getElementById("otpInput").value = "";
+  } else {
+    alert("Failed to send OTP: " + data.message);
+  }
+}
+
+
+
+async function sendSignupRequest() {
+  const username = document.getElementById("signup-username").value;
+  const email = document.getElementById("signup-email").value;
+  const password = document.getElementById("signup-password").value;
+  const confirm_password = document.getElementById("signup-confirm-password").value;
+
+  const response = await fetch("http://localhost:5000/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email, password, confirm_password }),
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    alert("Signup successful! Check email for OTP.");
+    switchForm("signin"); // Move to login form
+  } else {
+    alert("Signup failed: " + data.error);
+  }
+}
+
+async function handleLogin() {
+  const username = document.getElementById("signin-username").value;
+  const password = document.getElementById("signin-password").value;
+
+  const response = await fetch("http://localhost:5000/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    alert("Login successful!");
+    window.location.href = "dashb.html";  // ✅ redirect to dashboard
+  } else {
+    alert("Login failed: " + data.error);
+  }
+}
+
+async function sendForgotPasswordRequest(otp) {
+  const username = document.getElementById("forgot-username").value;
+  const new_password = document.getElementById("new-password").value;
+  const confirm_password = document.getElementById("confirm-new-password").value;
+
+  const response = await fetch("http://localhost:5000/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, new_password, confirm_password, otp }), // ✅ include OTP here
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    alert("Password reset successful!");
+    switchForm("signin");
+  } else {
+    alert("Reset failed: " + data.error);
+  }
+}
+
+
+
 async function showOtpModal() {
   let email = "";
 
@@ -116,131 +197,105 @@ async function showOtpModal() {
     email = document.getElementById("signup-email").value;
   } else if (currentFormType === "forgot") {
     const username = document.getElementById("forgot-username").value;
-    const result = await fetch("http://localhost:5000/get-email", {
+
+    // 🔥 Fetch email from backend using username
+    const res = await fetch("http://localhost:5000/get-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
+      body: JSON.stringify({ username }),
     });
-    const res = await result.json();
-    if (!res.success) {
+
+    const result = await res.json();
+    if (!result.success) {
       alert("Email not found for this username.");
       return;
     }
-    email = res.email;
-    forgotEmail = email;
-  } else {
-    const username = document.getElementById("signin-username").value;
-    const result = await fetch("http://localhost:5000/get-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-    const res = await result.json();
-    if (!res.success) {
-      alert("Email not found for this username.");
-      return;
-    }
-    email = res.email;
+
+    email = result.email;
+    forgotEmail = email;  // ✅ Save it globally for OTP verification
   }
 
-  // Send OTP
-  const otpRes = await fetch("http://localhost:5000/send-otp", {
+  const response = await fetch("http://localhost:5000/send-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email })
+    body: JSON.stringify({ email }),
   });
-  const otpResult = await otpRes.json();
 
-  if (!otpResult.success) {
-    alert("Failed to send OTP. Try again later.");
-    return;
+  const data = await response.json();
+  if (data.success) {
+    document.getElementById("otpModal").style.display = 'flex';
+    document.getElementById("otpInput").value = "";
+    console.log("📬 OTP sent to:", email); // ✅ for debugging
+  } else {
+    alert("Failed to send OTP: " + data.message);
   }
-
-  document.getElementById("otpModal").style.display = "flex";
 }
 
-// OTP Verify
-document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
-  const otp = document.getElementById("otp-input").value;
 
-  const email = currentFormType === "forgot" ? forgotEmail : document.getElementById("signup-email").value || (await getEmailForUsername());
 
-  const verifyRes = await fetch("http://localhost:5000/verify-otp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp })
-  });
-  const verifyResult = await verifyRes.json();
 
-  if (!verifyResult.success) {
-    alert("Invalid OTP. Try again.");
-    return;
+// Captcha Verification
+function verifyCaptcha() {
+  const userAnswer = parseInt(document.getElementById("captcha-answer").value);
+  const correctAnswer = parseInt(document.getElementById("verifyCaptchaBtn").dataset.answer);
+
+  if (userAnswer === correctAnswer) {
+    document.getElementById("captchaModal").style.display = 'none';
+
+    if (currentFormType === "signin") {
+      handleLogin();  // Sign in directly
+    } else {
+      sendOtp();  // 🔥 Only send OTP once, then open modal
+    }
+  } else {
+    alert("Incorrect captcha. Try again.");
+    generateCaptcha();
   }
+}
 
-  document.getElementById("otpModal").style.display = "none";
+
+async function verifyOtp() {
+  const otp = document.getElementById("otpInput").value;
+  let email = "";
 
   if (currentFormType === "signup") {
-    const username = document.getElementById("signup-username").value;
-    const password = document.getElementById("signup-password").value;
-    const confirmPass = document.getElementById("signup-confirm-password").value;
-
-    if (password !== confirmPass) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    const res = await fetch("http://localhost:5000/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password })
-    });
-    const result = await res.json();
-    alert(result.message || "Signup complete!");
-    if (result.success) switchForm("signin");
-
-  } else if (currentFormType === "signin") {
-    const username = document.getElementById("signin-username").value;
-    const password = document.getElementById("signin-password").value;
-
-    const res = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    const result = await res.json();
-
-    if (result.success) {
-      alert("Login successful!");
-      localStorage.setItem("username", username);
-      window.location.href = "dashboard.html";
-    } else {
-      alert(result.message || "Login failed.");
-    }
-
+    email = document.getElementById("signup-email").value;
   } else if (currentFormType === "forgot") {
-    const username = document.getElementById("forgot-username").value;
-    const newPassword = document.getElementById("new-password").value;
-
-    const res = await fetch("http://localhost:5000/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, new_password: newPassword })
-    });
-
-    const result = await res.json();
-    alert(result.message || "Password reset complete.");
-    if (result.success) switchForm("signin");
+    email = forgotEmail; // 🔥 Comes from showOtpModal() when OTP was sent
   }
-});
 
-// Helper to get email for login
-async function getEmailForUsername() {
-  const username = document.getElementById("signin-username").value;
-  const result = await fetch("http://localhost:5000/get-email", {
+  console.log("📤 VERIFY OTP FOR:", email, "OTP:", otp);
+
+  const response = await fetch("http://localhost:5000/verify-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
+    body: JSON.stringify({ email, otp }),
   });
-  const res = await result.json();
-  return res.email;
+
+  const data = await response.json();
+  if (data.success) {
+    document.getElementById("otpModal").style.display = 'none';
+
+    if (currentFormType === "signup") {
+      await sendSignupRequest();
+      window.location.href = "dashb.html";  // ✅ redirect after signup
+    } else if (currentFormType === "forgot") {
+      await sendForgotPasswordRequest(otp);
+    }
+  } else {
+    alert("❌ Invalid OTP. Try again.");
+  }
 }
+
+
+
+// Call once when the page loads
+createModals();
+document.addEventListener("click", (e) => {
+  if (e.target.id === "verifyCaptchaBtn") verifyCaptcha();
+  if (e.target.id === "verifyOtpBtn") verifyOtp();
+});
+
+switchForm('signin'); // Show signin form by default
+
+
