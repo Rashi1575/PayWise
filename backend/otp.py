@@ -5,7 +5,7 @@ from email.message import EmailMessage
 
 # Configuration
 SENDER_EMAIL = "codebloodedhackon@gmail.com"
-SENDER_PASSWORD = "fzlk fnvx undg rcti"
+SENDER_PASSWORD = "fzlk fnvx undg rcti"  # NOT your Gmail password. Use App Password.
 
 otp_store = {}
 
