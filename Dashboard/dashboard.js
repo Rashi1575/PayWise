@@ -164,6 +164,18 @@ document.addEventListener("DOMContentLoaded", () => {
     aboutSection.style.display = "block";
   });
 
+  // ───────────────────── LOGOUT ─────────────────────
+  document.getElementById("logoutLink")?.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // Optional: clear any saved session data
+    localStorage.removeItem("dark-mode"); // or any user info you stored
+
+    // Redirect to login page
+    window.location.href = "index.html";
+  });
+
+
 });
 
   
