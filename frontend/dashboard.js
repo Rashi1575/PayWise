@@ -1,11 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ──────── SECTION HELPERS ────────
+  /* ───────────────── HELPERS ───────────────── */
+  const sections = Array.from(document.querySelectorAll("main section"));
   const showOnly = (...els) => {
-    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+    sections.forEach(sec => sec.style.display = "none");
     els.forEach(el => el && (el.style.display = "block"));
   };
 
-  // ──────── DARK MODE SETUP ────────
+  /* ───────────────── CHART #1 (Pie) ───────────────── */
+  const pieCtx = document.getElementById("expenseChart")?.getContext("2d");
+  if (pieCtx) {
+    new Chart(pieCtx, {
+      type: "pie",
+      data: {
+        labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
+        datasets: [{
+          data: [5000, 2000, 1500, 3000, 1000],
+          backgroundColor: ["#00c9a7", "#4a90e2", "#f39c12", "#e74c3c", "#8e44ad"],
+          borderWidth: 0.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "right" } }
+      }
+    });
+  }
+
+  /* ───────────────── DARK MODE ───────────────── */
   const darkToggle = document.getElementById("dark-mode-toggle");
   if (darkToggle) {
     if (localStorage.getItem("dark-mode") === "enabled") {
@@ -19,30 +41,85 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ──────── PIE CHART: Spending ────────
-  const pieCanvas = document.getElementById("spendingChart");
-  if (pieCanvas) {
-    const ctx = pieCanvas.getContext("2d");
-    new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: ['Food', 'Transport', 'Utilities', 'Shopping', 'Others'],
-        datasets: [{
-          data: [5000, 2000, 1500, 3000, 1000],
-          backgroundColor: ['#00bfa5', '#00acc1', '#ffa726', '#ef5350', '#ab47bc'],
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } }
-      }
+  /* ───────────────── BUDGET PAGE NAV ───────────────── */
+  const budgetLink = document.getElementById("budgetLink");
+  const budgetSect = document.getElementById("budget-section");
+  if (budgetLink && budgetSect) {
+    budgetLink.addEventListener("click", e => {
+      e.preventDefault();
+      showOnly(budgetSect);
     });
   }
 
-  // ──────── BAR CHART: Budget ────────
-  const barCanvas = document.getElementById("budgetChart");
-  if (barCanvas) {
-    const barCtx = barCanvas.getContext("2d");
+  /* ───────────────── SAVE BUDGET BUTTON ───────────────── */
+  document.getElementById("saveBudget")?.addEventListener("click", () => {
+    const total  = document.getElementById("totalBudget").value.trim();
+    const cat    = document.getElementById("category").value;
+    const catAmt = document.getElementById("categoryBudget").value.trim();
+
+    if (!total || !catAmt) {
+      alert("Please enter both total budget and category budget.");
+      return;
+    }
+    alert(`Saved:\nTotal Budget: ₹${total}\n${cat}: ₹${catAmt}`);
+  });
+
+  const paywiseLink = document.getElementById("paywiseLink");
+  const paymentSection = document.getElementById("payment-section");
+  const insightsSection = document.getElementById("insights-section");
+
+  paywiseLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // Hide all sections
+    const allSections = document.querySelectorAll("main section");
+    allSections.forEach(sec => sec.style.display = "none");
+
+    // Show dashboard sections
+    paymentSection.style.display = "block";
+    insightsSection.style.display = "block";
+  });
+
+  /*-------------Profile Section ---------- */
+  const profileLink = document.getElementById("profileLink");
+  const profileSection = document.getElementById("profile-section");
+
+  profileLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+    profileSection.style.display = "block";
+  });
+
+  const rewardsLink = document.getElementById("rewardsLink");
+  const rewardsSection = document.getElementById("rewards-section");
+  const highestCategoryEl = document.getElementById("highestCategory");
+
+  rewardsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    sections.forEach(sec => sec.style.display = "none");
+    rewardsSection.style.display = "block";
+
+    // ⬇️ Replace with actual highest category if needed
+    const categoryData = {
+      labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
+      data: [5000, 2000, 1500, 3000, 1000]
+    };
+
+    const maxIndex = categoryData.data.indexOf(Math.max(...categoryData.data));
+    const topCategory = categoryData.labels[maxIndex];
+    highestCategoryEl.textContent = topCategory;
+
+    // Optionally: you can change offers dynamically here as well!
+  });
+
+  function copyReferral() {
+  navigator.clipboard.writeText("PAYWISE123");
+  alert("Referral code copied!");
+  }
+
+  /* ───────────────── CHART #2 (Bar) ───────────────── */
+  const barCtx = document.getElementById("budgetChart")?.getContext("2d");
+  if (barCtx) {
     new Chart(barCtx, {
       type: "bar",
       data: {
@@ -61,130 +138,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ──────── NAVIGATION SETUP ────────
-  const sections = {
-    dashboard: [document.getElementById("payment-section"), document.getElementById("insights-section")],
-    profile: document.getElementById("profile-section"),
-    budget: document.getElementById("budget-section"),
-    rewards: document.getElementById("rewards-section"),
-    about: document.getElementById("about-section"),
-    payments: document.getElementById("payment-history-section")
-  };
+  /* ───────────────── DASHBOARD (HOME & LOGO) NAV ───────────────── */
+  const paymentSect  = document.querySelector(".payment-section");
+  const insightsSect = document.querySelector(".insights-section");
 
-  document.getElementById("paywiseLink")?.addEventListener("click", e => {
-    e.preventDefault();
-    showOnly(...sections.dashboard);
-  });
-
+  // Home link
   document.getElementById("homeLink")?.addEventListener("click", e => {
     e.preventDefault();
-    showOnly(...sections.dashboard);
+    showOnly(paymentSect, insightsSect);
   });
 
-  document.getElementById("profileLink")?.addEventListener("click", e => {
+  // PayWise logo link
+  document.getElementById("paywiseLink")?.addEventListener("click", e => {
     e.preventDefault();
-    showOnly(sections.profile);
+    showOnly(paymentSect, insightsSect);
   });
 
-  document.getElementById("budgetLink")?.addEventListener("click", e => {
+  const aboutLink = document.getElementById("aboutLink");
+  const aboutSection = document.getElementById("about-section");
+
+  aboutLink.addEventListener("click", (e) => {
     e.preventDefault();
-    showOnly(sections.budget);
+    const allSections = document.querySelectorAll("main section");
+    allSections.forEach(sec => sec.style.display = "none");
+    aboutSection.style.display = "block";
   });
 
-  document.getElementById("aboutLink")?.addEventListener("click", e => {
+  // ───────────────────── LOGOUT ─────────────────────
+  document.getElementById("logoutLink")?.addEventListener("click", (e) => {
     e.preventDefault();
-    showOnly(sections.about);
-  });
 
-  document.getElementById("rewardsLink")?.addEventListener("click", e => {
-    e.preventDefault();
-    showOnly(sections.rewards);
+    // Optional: clear any saved session data
+    localStorage.removeItem("dark-mode"); // or any user info you stored
 
-    // Update top category
-    const categoryData = { labels: ["Food", "Transport", "Utilities", "Shopping", "Others"], data: [5000, 2000, 1500, 3000, 1000] };
-    const maxIndex = categoryData.data.indexOf(Math.max(...categoryData.data));
-    document.getElementById("highestCategory").textContent = categoryData.labels[maxIndex];
-  });
-
-  // ──────── BUDGET SAVE ────────
-  document.getElementById("saveBudget")?.addEventListener("click", () => {
-    const total = document.getElementById("totalBudget").value.trim();
-    const cat = document.getElementById("category").value;
-    const catAmt = document.getElementById("categoryBudget").value.trim();
-    if (!total || !catAmt) return alert("Please enter both total and category budget.");
-    alert(`Saved:\nTotal Budget: ₹${total}\n${cat}: ₹${catAmt}`);
-  });
-
-  // ──────── REFERRAL COPY ────────
-  document.querySelector(".referral-code")?.addEventListener("click", () => {
-    navigator.clipboard.writeText("PAYWISE123");
-    alert("Referral code copied!");
-  });
-
-  // ──────── PAYMENT HISTORY ────────
-  const payments = [
-    { id: "TXN001", date: "2025-06-12", type: "Grocery Shopping", withdrawal: 2000, deposit: 0, category: "Groceries", closing: 8000 },
-    { id: "TXN002", date: "2025-05-28", type: "Salary", withdrawal: 0, deposit: 15000, category: "Income", closing: 18000 }
-  ];
-
-  const renderTable = (data) => {
-    const tbody = document.querySelector("#paymentTable tbody");
-    tbody.innerHTML = "";
-    data.forEach(txn => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${txn.id}</td>
-        <td>${txn.date}</td>
-        <td>${txn.type}</td>
-        <td>${txn.withdrawal || '-'}</td>
-        <td>${txn.deposit || '-'}</td>
-        <td>${txn.category}</td>
-        <td>${txn.closing}</td>`;
-      tbody.appendChild(row);
-    });
-  };
-
-  document.getElementById("paymentHistoryBtn")?.addEventListener("click", e => {
-    e.preventDefault();
-    showOnly(sections.payments);
-    document.getElementById("monthSelect").value = "all";
-    renderTable(payments);
-  });
-
-  document.getElementById("monthSelect")?.addEventListener("change", function () {
-    const selected = this.value;
-    if (selected === "all") renderTable(payments);
-    else renderTable(payments.filter(txn => txn.date.startsWith(selected)));
-  });
-
-  renderTable(payments); // default load
-
-  // ──────── LIGHT/DARK TOGGLE FOR HISTORY ────────
-  document.getElementById("togglePayMode")?.addEventListener("click", () => {
-    const section = sections.payments;
-    section.classList.toggle("dark-mode");
-    section.classList.toggle("light-mode");
-  });
-
-  // ──────── LOGOUT + SESSION CHECK ────────
-  const username = localStorage.getItem("username");
-  const loggedIn = localStorage.getItem("loggedIn");
-
-  if (!loggedIn) {
-    alert("Please login first.");
-    window.location.href = "index.html";
-  }
-
-  document.getElementById("logoutBtn")?.addEventListener("click", e => {
-    e.preventDefault();
-    localStorage.removeItem("loggedIn");
-    localStorage.removeItem("username");
+    // Redirect to login page
     window.location.href = "index.html";
   });
 
-  // OPTIONAL: show username on dashboard if needed
-  const nameTag = document.getElementById("username");
-  if (username && nameTag) nameTag.textContent = username;
+
 });
 
   
