@@ -7,25 +7,47 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* ───────────────── CHART #1 (Pie) ───────────────── */
-  const pieCtx = document.getElementById("expenseChart")?.getContext("2d");
-  if (pieCtx) {
-    new Chart(pieCtx, {
-      type: "pie",
-      data: {
-        labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
-        datasets: [{
-          data: [5000, 2000, 1500, 3000, 1000],
-          backgroundColor: ["#00c9a7", "#4a90e2", "#f39c12", "#e74c3c", "#8e44ad"],
-          borderWidth: 0.5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "right" } }
+  // const pieCtx = document.getElementById("expenseChart")?.getContext("2d");
+  // if (pieCtx) {
+  //   new Chart(pieCtx, {
+  //     type: "pie",
+  //     data: {
+  //       labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
+  //       datasets: [{
+  //         data: [5000, 2000, 1500, 3000, 1000],
+  //         backgroundColor: ["#00c9a7", "#4a90e2", "#f39c12", "#e74c3c", "#8e44ad"],
+  //         borderWidth: 0.5
+  //       }]
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       maintainAspectRatio: false,
+  //       plugins: { legend: { position: "right" } }
+  //     }
+  //   });
+  // }
+
+  const ctx = document.getElementById('spendingChart').getContext('2d');
+  const spendingChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Food', 'Transport', 'Utilities', 'Shopping', 'Others'],
+      datasets: [{
+        label: 'Spending',
+        data: [5000, 2000, 1500, 3000, 1000],
+        backgroundColor: ['#00bfa5', '#00acc1', '#ffa726', '#ef5350', '#ab47bc'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false // Because you’re using a custom legend
+        }
       }
-    });
-  }
+    }
+  });
+
 
   /* ───────────────── DARK MODE ───────────────── */
   const darkToggle = document.getElementById("dark-mode-toggle");
@@ -165,6 +187,83 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ───────────────────── LOGOUT ─────────────────────
+  const payments = [
+  {
+    id: "TXN001",
+    date: "2025-06-12",
+    type: "Grocery Shopping",
+    withdrawal: 2000,
+    deposit: 0,
+    category: "Groceries",
+    closing: 8000
+  },
+  {
+    id: "TXN002",
+    date: "2025-05-28",
+    type: "Salary",
+    withdrawal: 0,
+    deposit: 15000,
+    category: "Income",
+    closing: 18000
+  },
+  // Add more dummy records
+    ];
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#paymentTable tbody");
+      tbody.innerHTML = ""; // Clear previous rows
+
+      data.forEach(txn => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${txn.id}</td>
+          <td>${txn.date}</td>
+          <td>${txn.type}</td>
+          <td>${txn.withdrawal || '-'}</td>
+          <td>${txn.deposit || '-'}</td>
+          <td>${txn.category}</td>
+          <td>${txn.closing}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.getElementById("monthSelect").addEventListener("change", function () {
+      const selected = this.value;
+      if (selected === "all") {
+        renderTable(payments);
+      } else {
+        const filtered = payments.filter(txn => txn.date.startsWith(selected));
+        renderTable(filtered);
+      }
+    });
+
+    // Load default table
+    renderTable(payments);
+
+    document.getElementById("paymentHistoryBtn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    // Optional: Hide all other sections
+    const allSections = document.querySelectorAll("main section");
+    allSections.forEach(sec => sec.style.display = "none");
+
+    // Show payment history section
+    const paymentSection = document.getElementById("payment-history-section");
+    if (paymentSection) paymentSection.style.display = "block";
+
+    // Optional: Reset month filter and render table again
+    document.getElementById("monthSelect").value = "all";
+    renderTable(payments);
+  });
+
+  document.getElementById("togglePayMode").addEventListener("click", () => {
+  const section = document.getElementById("payment-history-section");
+  section.classList.toggle("dark-mode");
+  section.classList.toggle("light-mode");
+  });
+
+  // ───────────────────── LOGOUT ─────────────────────
   document.getElementById("logoutLink")?.addEventListener("click", (e) => {
     e.preventDefault();
 
@@ -175,7 +274,4 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "index.html";
   });
 
-
 });
-
-  
