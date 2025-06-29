@@ -45,18 +45,16 @@ function generateCaptcha() {
   const operators = ["+", "-"];
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
-  let question;
-  let answer;
+  let question, answer;
 
-  switch (operator) {
-    case "+":
-      answer = num1 + num2;
-      question = `What is ${num1} + ${num2}?`;
-      break;
-    case "-":
-      answer = num1 - num2;
-      question = `What is ${num1} - ${num2}?`;
-      break;
+  if (operator === "+") {
+    answer = num1 + num2;
+    question = `What is ${num1} + ${num2}?`;
+  } else {
+    const a = Math.max(num1, num2);
+    const b = Math.min(num1, num2);
+    answer = a - b;
+    question = `What is ${a} - ${b}?`;
   }
 
   document.getElementById("captcha-question").textContent = question;
