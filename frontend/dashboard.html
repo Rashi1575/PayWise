@@ -17,7 +17,7 @@
           <a href="#" id="paywiseLink" style="font-size: 30px; font-weight: bold; color: #00c9a7; text-decoration: none;">PayWise</a>
         </li>
         <li><a href="#" id="profileLink">Profile</a></li>
-        <li><a href="#">Payment History</a></li>
+        <li><a href="#" id="paymentHistoryBtn">Payment History</a></li>
         <li><a href="#" id="budgetLink">Budget</a></li>
         <li><a href="#" id="rewardsLink">Rewards</a></li>
         <li><a href="#" id="aboutLink">About</a></li>
@@ -47,33 +47,47 @@
       </section>
 
       <!-- Spending Insights -->
-      <section class="insights-section" id="insights-section">
+      <section class="insights-section">
         <h2>Spending Insights</h2>
+
         <div class="insights-grid">
+          <!-- Textual insights -->
           <div class="insight-cards">
             <div class="card">Total Monthly Spending: ₹12,500</div>
             <div class="card">Highest Spending Category: Food</div>
             <div class="card">Suggested Savings: Dining, Entertainment</div>
           </div>
 
+          <!-- Chart area -->
           <div class="chart-container">
-            <label for="categorySelect">Select Month:</label>
-            <select id="categorySelect">
-              <option value="january">January</option>
-              <option value="february">February</option>
-              <option value="march">March</option>
-              <option value="march">April</option>
-              <option value="march">May</option>
-              <option value="march">June</option>
-              <option value="march">July</option>
-              <option value="march">August</option>
-              <option value="march">September</option>
-              <option value="march">October</option>
-              <option value="march">November</option>
-              <option value="march">December</option>
+            <div class="chart-header">
+              <select id="insight-month">
+                <option value="january">January</option>
+                <option value="february">February</option>
+                <option value="march">March</option>
+                <option value="march">April</option>
+                <option value="march">May</option>
+                <option value="march">June</option>
+                <option value="march">July</option>
+                <option value="march">August</option>
+                <option value="march">September</option>
+                <option value="march">October</option>
+                <option value="march">November</option>
+                <option value="march">December</option>
+              </select>
+            </div>
 
-            </select>
-            <canvas id="expenseChart"></canvas>
+            <canvas id="spendingChart" width="300" height="300"></canvas>
+
+            <div id="chart-legend">
+              <ul>
+                <li><span class="dot food"></span> Food</li>
+                <li><span class="dot transport"></span> Transport</li>
+                <li><span class="dot utilities"></span> Utilities</li>
+                <li><span class="dot shopping"></span> Shopping</li>
+                <li><span class="dot others"></span> Others</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -152,8 +166,42 @@
           </div>
         </div>
       </section>
+      
+      <!-- Payment History Section -->
+      <section id="payment-history-section" class="light-mode">
+        <div class="payment-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>Payment History</h2>
+          <button id="togglePayMode" title="Toggle light/dark mode">🌓</button>
+        </div>
 
-      <!-- Rewards Section -->
+        <label for="monthSelect">Select Month:</label>
+        <select id="monthSelect">
+          <option value="all">All Months</option>
+          <option value="2025-06">June 2025</option>
+          <option value="2025-05">May 2025</option>
+          <option value="2025-04">April 2025</option>
+          <!-- Add more months as needed -->
+        </select>
+
+        <table id="paymentTable">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Transaction</th>
+              <th>Withdrawal</th>
+              <th>Deposit</th>
+              <th>Category</th>
+              <th>Closing Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows inserted dynamically -->
+          </tbody>
+        </table>
+      </section>
+
+      
       <section class="rewards-section" id="rewards-section" style="display: none;">
         <h2>Rewards</h2>
 
