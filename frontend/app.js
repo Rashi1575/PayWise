@@ -40,11 +40,30 @@ function createModals() {
 }
 
 function generateCaptcha() {
-  const num1 = Math.floor(Math.random() * 10);
-  const num2 = Math.floor(Math.random() * 10);
-  document.getElementById("captcha-question").textContent = `What is ${num1} + ${num2}?`;
-  return num1 + num2;
+  const num1 = Math.floor(Math.random() * 100) + 1;
+  const num2 = Math.floor(Math.random() * 100) + 1;
+  const operators = ["+", "-"];
+  const operator = operators[Math.floor(Math.random() * operators.length)];
+
+  let question;
+  let answer;
+
+  switch (operator) {
+    case "+":
+      answer = num1 + num2;
+      question = `What is ${num1} + ${num2}?`;
+      break;
+    case "-":
+      answer = num1 - num2;
+      question = `What is ${num1} - ${num2}?`;
+      break;
+  }
+
+  document.getElementById("captcha-question").textContent = question;
+  return answer;
 }
+
+
 
 function showCaptchaModal(formType) {
   currentFormType = formType;
@@ -142,7 +161,7 @@ async function sendSignupRequest() {
 
   const data = await response.json();
   if (data.success) {
-    alert("Signup successful! Check email for OTP.");
+    alert("Signup successful! ");
     switchForm("signin"); // Move to login form
   } else {
     alert("Signup failed: " + data.error);
