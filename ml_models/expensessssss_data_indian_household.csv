@@ -1,0 +1,530 @@
+Description,Amount,Category
+doctor visit purchase,3000,Healthcare
+gadgets purchase,1200,Shopping
+hospital cost,3000,Healthcare
+online course expense,500,Education
+hospital payment,300,Healthcare
+Rapido bike ride,45,Transportation
+takeaway purchase,800,Food and grocery
+Art supplies,650,Education
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+fan,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+cycle,1000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+gaming console,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+ps5,20000,shopping
+FastTag recharge,1000,Transportation
+Ola cab ride,280,Transportation
+Thermometer,180,Healthcare
+Coursera subscription,3900,Education
+shoes purchase,2500,Shopping
+Netflix subscription,649,Housing and Bills
+Stationery,450,Education
+checkup bill,1200,Healthcare
+Amazon Prime membership,1499,Housing and Bills
+parking cost,300,Transportation
+lab test cost,600,Healthcare
+Car loan EMI,18000,Transportation
+Health supplements,850,Healthcare
+Local restaurant dinner,1200,Food and grocery
+checkup payment,300,Healthcare
+Educational software,3500,Education
+rent cost,800,Housing and Bills
+online course expense,6000,Education
+restaurant meal expense,500,Food and grocery
+Car battery,4500,Transportation
+IRCTC booking,1200,Transportation
+Furniture purchase,12000,Shopping
+Fresh fruits,300,Food and grocery
+Music lessons,2000,Education
+CT scan,4500,Healthcare
+Bike petrol,450,Transportation
+Birthday cake,850,Food and grocery
+parking expense,150,Transportation
+metro ticket purchase,300,Transportation
+supplies purchase,500,Education
+Hobby expenses,2000,Others
+medicine bill,1200,Healthcare
+BigBasket grocery order,2500,Food and grocery
+gas bill cost,1500,Housing and Bills
+Zomato food delivery,450,Food and grocery
+water bill bill,2500,Housing and Bills
+bus fare payment,500,Transportation
+Private tuition,3000,Education
+bus fare bill,300,Transportation
+ELSS investment,10000,Savings
+petrol bill,150,Transportation
+medicine expense,600,Healthcare
+Dry cleaning,450,Others
+doctor visit purchase,600,Healthcare
+lab test expense,300,Healthcare
+petrol bill,50,Transportation
+Kitchen utensils,850,Shopping
+Auto rickshaw,80,Transportation
+Water bill,450,Housing and Bills
+Air conditioner,45000,Shopping
+Flight booking,8500,Transportation
+Dinner buffet,800,Food and grocery
+online course cost,3000,Education
+Chicken from butcher,350,Food and grocery
+Jewelry,15000,Shopping
+Books purchase,650,Shopping
+home items payment,5000,Shopping
+cab ride expense,300,Transportation
+Daily milk,200,Food and grocery
+Home loan EMI,25000,Housing and Bills
+Car petrol,2200,Transportation
+Laptop purchase,55000,Shopping
+Car insurance,12000,Transportation
+Train ticket,850,Transportation
+Disney Hotstar subscription,899,Housing and Bills
+Physiotherapy,750,Healthcare
+Fish from market,400,Food and grocery
+Blinkit quick delivery,180,Food and grocery
+coffee payment,1200,Food and grocery
+exam fees payment,1500,Education
+Dry fruits,650,Food and grocery
+auto fare bill,800,Transportation
+Handbag,2200,Shopping
+Amusement park,1500,Others
+Charity,2000,Others
+EPF contribution,6000,Savings
+coffee bill,150,Food and grocery
+Subway sandwich,280,Food and grocery
+Property tax,3500,Housing and Bills
+groceries cost,300,Food and grocery
+home items cost,2500,Shopping
+ULIP premium,18000,Savings
+dental expense,2000,Healthcare
+online course bill,1500,Education
+electricity bill expense,1500,Housing and Bills
+McDonald's meal,320,Food and grocery
+JioMart grocery,1800,Food and grocery
+vegetables purchase,300,Food and grocery
+Newspaper subscription,350,Housing and Bills
+books expense,1500,Education
+exam fees bill,12000,Education
+Pest control,800,Housing and Bills
+takeaway bill,500,Food and grocery
+electricity bill cost,2500,Housing and Bills
+Ayurvedic medicine,450,Healthcare
+groceries purchase,1200,Food and grocery
+clothes expense,2500,Shopping
+supplies bill,1500,Education
+books expense,3000,Education
+gadgets expense,5000,Shopping
+Byju's app,12000,Education
+coffee payment,800,Food and grocery
+Spectacles,3200,Healthcare
+Lab test,1200,Healthcare
+Sukanya Samriddhi,12500,Savings
+Spices purchase,250,Food and grocery
+mobile recharge cost,2500,Housing and Bills
+school fees purchase,3000,Education
+mobile recharge purchase,800,Housing and Bills
+Gym membership,3000,Healthcare
+groceries payment,800,Food and grocery
+Metro card recharge,500,Transportation
+cab ride expense,800,Transportation
+Myntra order,850,Shopping
+Grofers vegetables,450,Food and grocery
+Electrician work,850,Housing and Bills
+accessories bill,2500,Shopping
+Burger King combo,380,Food and grocery
+Post office savings,3000,Savings
+Amazon Fresh order,950,Food and grocery
+Bed sheets,1200,Shopping
+lab test purchase,2000,Healthcare
+mobile recharge purchase,400,Housing and Bills
+Child education fund,8000,Savings
+Educational tour,5000,Education
+cab ride expense,150,Transportation
+Contact lenses,1500,Healthcare
+Concert tickets,2500,Others
+Emergency fund,10000,Savings
+tuition bill,3000,Education
+snacks bill,150,Food and grocery
+Bike insurance,2800,Transportation
+Microwave oven,15000,Shopping
+rent purchase,4000,Housing and Bills
+Local bus fare,25,Transportation
+dental expense,3000,Healthcare
+BP monitor,2200,Healthcare
+Festival celebration,5000,Others
+Traffic fine,500,Others
+Headphones,3500,Shopping
+Toys for kids,850,Shopping
+school fees purchase,6000,Education
+hospital payment,1200,Healthcare
+Frozen food,420,Food and grocery
+Reference books,1200,Education
+shoes bill,8000,Shopping
+Vacuum cleaner,8500,Shopping
+Birthday party,3500,Others
+electronics expense,5000,Shopping
+YouTube Premium,129,Housing and Bills
+Vaccination,1200,Healthcare
+metro ticket purchase,50,Transportation
+clothes bill,1200,Shopping
+Pizza Hut delivery,920,Food and grocery
+internet bill bill,400,Housing and Bills
+metro ticket purchase,150,Transportation
+Wallet,850,Shopping
+Flipkart order,1800,Shopping
+Street food chaat,80,Food and grocery
+electronics purchase,2500,Shopping
+MRI scan,8500,Healthcare
+Bike service,1200,Transportation
+petrol payment,800,Transportation
+fruits expense,1200,Food and grocery
+Washing machine,22000,Shopping
+school fees payment,12000,Education
+Gaming expenses,300,Others
+restaurant meal cost,150,Food and grocery
+Fixed deposit,50000,Savings
+Pet care,650,Others
+Tire replacement,8000,Transportation
+books cost,500,Education
+Gaming console,35000,Shopping
+Clothes shopping,1200,Shopping
+groceries payment,500,Food and grocery
+Driving license,350,Transportation
+Washing machine service,950,Housing and Bills
+Coaching classes,8000,Education
+RedBus booking,480,Transportation
+Swimming classes,2500,Education
+medicine expense,2000,Healthcare
+Doctor consultation,800,Healthcare
+vegetables bill,150,Food and grocery
+Refrigerator repair,1800,Housing and Bills
+Fresh bread,35,Food and grocery
+Hotel breakfast,180,Food and grocery
+Sports equipment,1800,Education
+College tuition,25000,Education
+Miscellaneous,500,Others
+Mutual fund SIP,5000,Savings
+AC repair,2200,Housing and Bills
+accessories expense,1200,Shopping
+groceries cost,150,Food and grocery
+tuition purchase,500,Education
+school fees purchase,500,Education
+electronics purchase,500,Shopping
+Wedding expenses,25000,Others
+School books,2500,Education
+Hostel fees,35000,Education
+parking bill,50,Transportation
+Parking charges,50,Transportation
+supplies payment,6000,Education
+Passport renewal,1500,Others
+gadgets cost,500,Shopping
+clothes purchase,5000,Shopping
+doctor visit purchase,1200,Healthcare
+water bill payment,400,Housing and Bills
+PPF deposit,12500,Savings
+Income tax payment,25000,Others
+electricity bill payment,400,Housing and Bills
+electronics payment,8000,Shopping
+books expense,6000,Education
+Study laptop,45000,Education
+Lunch thali,120,Food and grocery
+Tea stall chai,20,Food and grocery
+auto fare cost,150,Transportation
+NSC purchase,8000,Savings
+auto fare purchase,300,Transportation
+Health insurance premium,18000,Healthcare
+Wedding gift,3000,Shopping
+internet bill payment,1500,Housing and Bills
+lab test bill,1200,Healthcare
+shoes cost,5000,Shopping
+First aid kit,320,Healthcare
+dental bill,1200,Healthcare
+metro ticket purchase,500,Transportation
+tuition expense,12000,Education
+electricity bill purchase,4000,Housing and Bills
+restaurant meal purchase,1200,Food and grocery
+checkup cost,600,Healthcare
+fruits expense,300,Food and grocery
+Television,35000,Shopping
+doctor visit bill,300,Healthcare
+Library membership,800,Education
+Watch,4500,Shopping
+Digital gold,2500,Savings
+Retirement fund,15000,Savings
+exam fees cost,3000,Education
+Dominos pizza online,850,Food and grocery
+restaurant meal bill,800,Food and grocery
+Salon visit,1200,Others
+Yoga classes,1500,Healthcare
+vegetables purchase,1200,Food and grocery
+rent cost,1500,Housing and Bills
+Rice 20kg bag,800,Food and grocery
+Ambulance service,1500,Healthcare
+water bill cost,4000,Housing and Bills
+Laundry service,350,Others
+shoes bill,500,Shopping
+petrol payment,500,Transportation
+School uniform,850,Education
+accessories purchase,5000,Shopping
+Eye checkup,650,Healthcare
+tuition payment,1500,Education
+Unacademy plus,8000,Education
+internet bill purchase,2500,Housing and Bills
+Society maintenance,1200,Housing and Bills
+dental bill,600,Healthcare
+Plumber service,650,Housing and Bills
+Bike loan EMI,4500,Transportation
+snacks cost,800,Food and grocery
+LIC premium,15000,Savings
+Perfume,1800,Shopping
+Coffee shop visit,180,Food and grocery
+Packaged snacks,80,Food and grocery
+Cooking oil,180,Food and grocery
+Iron box,1500,Shopping
+Dance classes,1500,Education
+online course bill,12000,Education
+gas bill expense,2500,Housing and Bills
+Visa application,8000,Others
+Bus ticket,650,Transportation
+Mobile recharge,399,Housing and Bills
+snacks purchase,300,Food and grocery
+gas bill purchase,800,Housing and Bills
+water bill expense,1500,Housing and Bills
+Birthday gift,1500,Shopping
+Electricity bill payment,2800,Housing and Bills
+rent purchase,2500,Housing and Bills
+Haircut,200,Others
+auto fare purchase,500,Transportation
+fruits purchase,150,Food and grocery
+books expense,12000,Education
+KFC chicken bucket,750,Food and grocery
+fruits cost,500,Food and grocery
+hospital cost,600,Healthcare
+Apollo pharmacy,280,Healthcare
+Lost item replacement,800,Others
+gadgets bill,8000,Shopping
+Legal consultation,2500,Others
+Water purifier,15000,Shopping
+Hospital bill,15000,Healthcare
+parking purchase,500,Transportation
+ATM charges,50,Others
+Magazine subscription,500,Housing and Bills
+Airtel broadband,899,Housing and Bills
+Ice cream,120,Food and grocery
+cab ride cost,500,Transportation
+Cryptocurrency,5000,Savings
+lab test payment,3000,Healthcare
+Wheat flour,320,Food and grocery
+clothes cost,500,Shopping
+restaurant meal expense,300,Food and grocery
+takeaway purchase,300,Food and grocery
+metro ticket bill,800,Transportation
+Shoes purchase,2800,Shopping
+gadgets payment,2500,Shopping
+Calculator,850,Education
+Home insurance,8500,Housing and Bills
+Exam fees,1500,Education
+School bag,1200,Education
+Haldirams snacks,150,Food and grocery
+House cleaning,1500,Housing and Bills
+internet bill cost,800,Housing and Bills
+Starbucks coffee,350,Food and grocery
+Sunglasses,1200,Shopping
+Monthly house rent,18000,Housing and Bills
+dental expense,300,Healthcare
+shoes payment,1200,Shopping
+Bank charges,200,Others
+auto fare purchase,50,Transportation
+doctor visit expense,2000,Healthcare
+coffee bill,500,Food and grocery
+Religious donation,1000,Others
+Photography session,8000,Others
+electricity bill bill,800,Housing and Bills
+checkup payment,2000,Healthcare
+vegetables payment,500,Food and grocery
+exam fees expense,500,Education
+checkup expense,3000,Healthcare
+internet bill bill,4000,Housing and Bills
+bus fare bill,50,Transportation
+Movie tickets,800,Others
+Skincare products,1200,Shopping
+Gas cylinder,850,Housing and Bills
+Credit card annual fee,1500,Others
+Government bonds,25000,Savings
+gas bill bill,400,Housing and Bills
+takeaway purchase,150,Food and grocery
+Blood test,800,Healthcare
+Dish TV subscription,380,Housing and Bills
+Swiggy dinner order,680,Food and grocery
+BSNL landline,350,Housing and Bills
+Car servicing,3500,Transportation
+Spa treatment,3500,Others
+Festival sweets,500,Food and grocery
+takeaway payment,1200,Food and grocery
+RC renewal,500,Transportation
+accessories cost,500,Shopping
+DTH recharge Tata Sky,450,Housing and Bills
+home items cost,1200,Shopping
+cab ride purchase,50,Transportation
+snacks bill,500,Food and grocery
+Cafe Coffee Day,220,Food and grocery
+water bill purchase,800,Housing and Bills
+Car wash,200,Transportation
+bus fare expense,800,Transportation
+Refrigerator,28000,Shopping
+clothes cost,8000,Shopping
+exam fees expense,6000,Education
+Vedantu classes,6000,Education
+mobile recharge bill,1500,Housing and Bills
+tuition bill,6000,Education
+rent purchase,400,Housing and Bills
+snacks bill,1200,Food and grocery
+Airtel Digital TV,420,Housing and Bills
+medicine purchase,3000,Healthcare
+Mobile bill postpaid,599,Housing and Bills
+Home decor,2500,Shopping
+Stock investment,12000,Savings
+supplies payment,3000,Education
+Term insurance,8500,Savings
+Mixer grinder,3500,Shopping
+Spotify premium,119,Housing and Bills
+Jio fiber internet,699,Housing and Bills
+home items payment,500,Shopping
+coffee cost,300,Food and grocery
+vegetables purchase,800,Food and grocery
+Vegetable vendor,150,Food and grocery
+gas bill purchase,4000,Housing and Bills
+Cosmetics,950,Shopping
+petrol payment,300,Transportation
+Recurring deposit,2000,Savings
+school fees payment,1500,Education
+parking bill,800,Transportation
+accessories bill,8000,Shopping
+fruits purchase,800,Food and grocery
+mobile recharge payment,4000,Housing and Bills
+Amazon purchase,2500,Shopping
+Online course,1200,Education
+Mobile phone,25000,Shopping
+medicine expense,300,Healthcare
+Medicine purchase,650,Healthcare
+hospital expense,2000,Healthcare
+Toll plaza,180,Transportation
+electronics payment,1200,Shopping
+Courier charges,150,Others
+School fees,15000,Education
+supplies bill,12000,Education
+Local kirana store,320,Food and grocery
+Gold ETF,7500,Savings
+Uber booking,320,Transportation
+Dental treatment,2500,Healthcare
+bus fare bill,150,Transportation
+home items bill,8000,Shopping
+X-ray,450,Healthcare
