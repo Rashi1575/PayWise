@@ -6,27 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     els.forEach(el => el && (el.style.display = "block"));
   };
 
-  /* ───────────────── CHART #1 (Pie) ───────────────── */
-  // const pieCtx = document.getElementById("expenseChart")?.getContext("2d");
-  // if (pieCtx) {
-  //   new Chart(pieCtx, {
-  //     type: "pie",
-  //     data: {
-  //       labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
-  //       datasets: [{
-  //         data: [5000, 2000, 1500, 3000, 1000],
-  //         backgroundColor: ["#00c9a7", "#4a90e2", "#f39c12", "#e74c3c", "#8e44ad"],
-  //         borderWidth: 0.5
-  //       }]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       maintainAspectRatio: false,
-  //       plugins: { legend: { position: "right" } }
-  //     }
-  //   });
-  // }
-
   const ctx = document.getElementById('spendingChart').getContext('2d');
   const spendingChart = new Chart(ctx, {
     type: 'pie',
