@@ -18,19 +18,27 @@ headers = {
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# ✅ Authenticate user login
 def authenticate_user(username, password):
     hashed_password = hash_password(password)
 
-    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&password=eq.{hashed_password}&select=id"
+    # ✅ Only filter by username — fetch the user
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&select=password"
     res = requests.get(url, headers=headers)
 
     if res.status_code == 200 and res.json():
-        return True
-    else:
-        print("❌ Login failed or wrong credentials.")
-        return False
+        db_password = res.json()[0]['password']
+        print("🔒 Supabase stored hash:", db_password)
+        print("🔐 Hash of entered password:", hashed_password)
 
+        if hashed_password == db_password:
+            return True
+        else:
+            print("❌ Password mismatch.")
+    else:
+        print("❌ User not found or Supabase error.")
+
+    return False
+    
 # ✅ Reset password using OTP (email must already be verified)
 def reset_password(username, new_password, confirm_password, otp):
     if new_password != confirm_password:
