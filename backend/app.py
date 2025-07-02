@@ -99,5 +99,60 @@ def verify_otp_route():
     success, message = verify_otp(email, otp)
     return jsonify({"success": success, "message": message})
 
+#NEW
+@app.route('/profile/<username>', methods=['GET'])
+def get_profile(username):
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&select=full_name,email,phone,gender,nationality,address"
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200 and response.json():
+        return jsonify({"success": True, "data": response.json()[0]})
+    else:
+        return jsonify({"success": False, "error": "User not found"}), 404
+
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    data = request.get_json()
+    username = data.get('username')
+
+    if not username:
+        return jsonify({"success": False, "error": "Username is required"}), 400
+
+    # Prepare update fields dynamically
+    update_fields = {
+        "full_name": data.get("full_name"),
+        "email": data.get("email"),
+        "phone": data.get("phone"),
+        "gender": data.get("gender"),
+        "nationality": data.get("nationality"),
+        "address": data.get("address"),
+    }
+
+    # Remove None fields (only send updates for provided fields)
+    update_fields = {k: v for k, v in update_fields.items() if v is not None}
+
+    if not update_fields:
+        return jsonify({"success": False, "error": "No fields to update"}), 400
+
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}"
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+
+    response = requests.patch(url, headers=headers, json=update_fields)
+
+    if response.status_code in (200, 204):
+        return jsonify({"success": True, "message": "Profile updated"})
+    else:
+        return jsonify({"success": False, "error": response.text}), 400
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
