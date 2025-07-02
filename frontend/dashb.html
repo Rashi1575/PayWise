@@ -133,7 +133,7 @@
       </section>
 
       <!-- Profile Section -->
-      <section class="profile-section" id="profile-section" style="display: none;">
+           <section class="profile-section" id="profile-section" style="display: none;">
         <h2>Profile</h2>
         <div class="profile-container">
           <div class="profile-header">
@@ -141,28 +141,31 @@
             <h3 id="username">JohnDoe123</h3>
           </div>
           <div class="profile-fields">
-            <label>Full Name:</label>
-            <input type="text" placeholder="John Doe" />
 
-            <label>Email ID:</label>
-            <input type="email" placeholder="john@example.com" />
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" placeholder="John Doe" />
 
-            <label>Phone Number:</label>
-            <input type="tel" placeholder="+91-9876543210" />
+            <label for="email">Email ID:</label>
+            <input type="email" id="email" placeholder="john@example.com" />
 
-            <label>Gender:</label>
-            <select>
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" placeholder="+91-9876543210" />
+
+            <label for="gender">Gender:</label>
+            <select id="gender">
               <option>Male</option>
               <option>Female</option>
               <option>Other</option>
               <option>Prefer not to say</option>
             </select>
 
-            <label>Nationality:</label>
-            <input type="text" placeholder="Indian" />
+            <label for="nationality">Nationality:</label>
+            <input type="text" id="nationality" placeholder="Indian" />
 
-            <label>Address:</label>
-            <textarea placeholder="123, Street Name, City, Zip"></textarea>
+            <label for="address">Address:</label>
+            <textarea id="address" placeholder="123, Street Name, City, Zip"></textarea>
+
+            <button id="saveProfileBtn">Save</button>
           </div>
         </div>
       </section>
