@@ -15,7 +15,7 @@ def send_otp(email):
         "otp": otp,
         "created_at": time.time()
     }
-    print(f"📬 OTP stored for {email}: {otp_store[email]}")
+    print(f" OTP stored for {email}: {otp_store[email]}")
 
     msg = EmailMessage()
     msg['Subject'] = 'Your OTP Code'
@@ -32,11 +32,11 @@ def send_otp(email):
         return False, f"Failed to send OTP: {e}"
 
 def verify_otp(email, input_otp):
-    print(f"🧪 Verifying OTP for {email}: got {input_otp}")
+    print(f"Verifying OTP for {email}: got {input_otp}")
     if email not in otp_store:
-        print("❌ Email not found in OTP store!")
+        print(" Email not found in OTP store!")
     else:
-        print(f"✅ Stored OTP: {otp_store[email]['otp']}")
+        print(f"Stored OTP: {otp_store[email]['otp']}")
 
     if email not in otp_store:
         return False, "No OTP sent to this email"
