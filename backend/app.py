@@ -4,9 +4,16 @@ from login import authenticate_user, reset_password
 from signup import register_user
 from otp import send_otp, verify_otp
 import os
+import requests
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend to connect
+# CORS(app, origins=["http://localhost:3000"])
+
+# Supabase RESTful config
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
 
 # Signup Route
 @app.route('/signup', methods=['POST'])
@@ -47,16 +54,35 @@ def forgot_password():
     username = data['username']
     new_password = data['new_password']
     confirm_password = data['confirm_password']
-    otp = data['otp']  # ✅ important
+    otp = data['otp']  # important
 
     try:
-        login.reset_password(username, new_password, confirm_password, otp)
+        # login.reset_password(username, new_password, confirm_password, otp)
+        reset_password(username, new_password, confirm_password, otp)
         return jsonify({"success": True, "message": "Password reset!"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
+# NEWW
+@app.route('/get-email', methods=['POST'])
+def get_email_by_username():
+    data = request.get_json()
+    username = data.get('username')
 
+    if not username:
+        return jsonify({"success": False, "message": "Username missing"}), 400
 
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE}?username=eq.{username}&select=email"
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}"
+    }
+    res = requests.get(url, headers=headers)
 
+    if res.status_code == 200 and res.json():
+        email = res.json()[0]['email']
+        return jsonify({"success": True, "email": email})
+    else:
+        return jsonify({"success": False, "message": "User not found"}), 404
 
 # OTP Routes
 @app.route('/send-otp', methods=['POST'])
@@ -65,12 +91,6 @@ def send_otp_route():
     success, message = send_otp(email)
     return jsonify({"success": success, "message": message})
 
-# @app.route('/verify-otp', methods=['POST'])
-# def verify_otp_route():
-#     email = request.get_json()['email']
-#     otp = request.get_json()['otp']
-#     success, message = verify_otp(email, otp)
-#     return jsonify({"success": success, "message": message})
 @app.route('/verify-otp', methods=['POST'])
 def verify_otp_route():
     data = request.get_json()
@@ -78,8 +98,6 @@ def verify_otp_route():
     otp = data['otp']
     success, message = verify_otp(email, otp)
     return jsonify({"success": success, "message": message})
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
