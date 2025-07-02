@@ -253,4 +253,61 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "index.html";
   });
 
+    // NEW
+
+  function loadProfile() {
+    const username = localStorage.getItem("username");
+    if (!username) return;
+
+    fetch(`http://localhost:5000/profile/${username}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const profile = data.data;
+          document.getElementById("username").textContent = username;
+          document.getElementById("fullName").value = profile.full_name || "";
+          document.getElementById("email").value = profile.email || "";
+          document.getElementById("phone").value = profile.phone || "";
+          document.getElementById("gender").value = profile.gender || "";
+          document.getElementById("nationality").value = profile.nationality || "";
+          document.getElementById("address").value = profile.address || "";
+        }
+      });
+  }
+
+
+  function saveProfileData() {
+    const username = localStorage.getItem("username");
+    if (!username) return alert("No user logged in.");
+
+    const full_name   = document.getElementById("fullName").value;
+    const email       = document.getElementById("email").value;
+    const phone       = document.getElementById("phone").value;
+    const gender      = document.getElementById("gender").value;
+    const nationality = document.getElementById("nationality").value;
+    const address     = document.getElementById("address").value;
+
+    fetch("http://localhost:5000/update-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        full_name,
+        email,
+        phone,
+        gender,
+        nationality,
+        address
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) alert("✅ Profile saved!");
+      else alert("❌ Error saving profile: " + data.error);
+    })
+    .catch(err => alert("❌ Server error: " + err));
+  }
+
+  document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
+
 });
