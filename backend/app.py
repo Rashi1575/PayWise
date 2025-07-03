@@ -4,16 +4,25 @@ from login import authenticate_user, reset_password
 from signup import register_user
 from otp import send_otp, verify_otp
 import os
+import joblib
+import datetime
+import supabase
+from supabase import create_client
+import pandas as pd
 import requests
+
+from dotenv import load_dotenv
+load_dotenv()
+
+# Supabase setup
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
+TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
+
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend to connect
-# CORS(app, origins=["http://localhost:3000"])
-
-# Supabase RESTful config
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
-TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
 
 # Signup Route
 @app.route('/signup', methods=['POST'])
@@ -54,15 +63,16 @@ def forgot_password():
     username = data['username']
     new_password = data['new_password']
     confirm_password = data['confirm_password']
-    otp = data['otp']  # important
+    otp = data['otp']  # ✅ important
 
     try:
-        # login.reset_password(username, new_password, confirm_password, otp)
         reset_password(username, new_password, confirm_password, otp)
         return jsonify({"success": True, "message": "Password reset!"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
-# NEWW
+
+
+
 @app.route('/get-email', methods=['POST'])
 def get_email_by_username():
     data = request.get_json()
@@ -153,6 +163,132 @@ def update_profile():
         return jsonify({"success": True, "message": "Profile updated"})
     else:
         return jsonify({"success": False, "error": response.text}), 400
+
+
+
+
+
+# Load ML models
+expense_clf = joblib.load("expense_classifier_model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")  # If you saved it separately
+fraud_model = joblib.load("fraud_model.pkl")
+
+@app.route("/make-payment", methods=["POST"])
+def make_payment():
+    try:
+        data = request.get_json()
+        sender_username = data["sender"]
+        receiver_username = data["receiver"]
+        amount = float(data["amount"])
+        desc = data["description"]
+        method = data["payment_method"]
+        timestamp = str(datetime.datetime.utcnow())
+
+        # --- 1. Fetch sender and receiver from Supabase ---
+        sender_res = supabase.table("users").select("*").eq("username", sender_username).execute()
+        receiver_res = supabase.table("users").select("*").eq("username", receiver_username).execute()
+
+        if not sender_res.data or not receiver_res.data:
+            return jsonify({"success": False, "error": "Sender or Receiver not found"}), 404
+
+        sender = sender_res.data[0]
+        receiver = receiver_res.data[0]
+
+        if sender["balance"] < amount:
+            return jsonify({"success": False, "error": "Insufficient balance"}), 400
+
+        # --- 2. Predict category using ML ---
+        cleaned_desc = desc.lower()
+        tfidf = vectorizer.transform([cleaned_desc])
+        category = expense_clf.predict(tfidf)[0]
+
+        CATEGORY_MAP = {
+            "Food": "Food and Grocery",
+            "Food and grocery": "Food and Grocery",
+            "Transport": "Transportation",
+            "Transportation": "Transportation",
+            "Utilities": "Housing and Bills",
+            "Housing": "Housing and Bills",
+            "Bills": "Housing and Bills",
+            "Healthcare": "Healthcare",
+            "Education": "Education",
+            "Shopping": "Shopping",
+            "Savings": "Savings",
+            "Others": "Others"
+        }
+        category = CATEGORY_MAP.get(category, "Others")
+
+        # --- 3. Fraud detection (basic rule or ML) ---
+        transaction = {
+            "amount": amount,
+            "description": desc,
+            "payment_method": method,
+            "user_id": sender["username"],
+            "timestamp": timestamp
+        }
+        is_fraud = amount > 10000  # Or use your ML model here
+
+        if is_fraud:
+            # Log the blocked fraud attempt (optional but useful)
+            supabase.table("payments").insert({
+                "user_id": sender["username"],
+                "amount": amount,
+                "category": category,
+                "description": desc,
+                "payment_method": method,
+                "timestamp": timestamp,
+                "is_fraud": True
+            }).execute()
+
+            return jsonify({
+                "success": False,
+                "error": "⚠️ Fraud detected. Payment has been blocked.",
+                "is_fraud": True
+            }), 403
+
+        # --- 4. Update balances (only if not fraud) ---
+        new_sender_balance = sender["balance"] - amount
+        new_receiver_balance = receiver["balance"] + amount
+
+        supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender["username"]).execute()
+        supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver["username"]).execute()
+
+        # --- 5. Insert legit transaction in payments table ---
+        supabase.table("payments").insert({
+            "user_id": sender["username"],
+            "amount": amount,
+            "category": category,
+            "description": desc,
+            "payment_method": method,
+            "timestamp": timestamp,
+            "is_fraud": False
+        }).execute()
+
+        return jsonify({
+            "success": True,
+            "message": "✅ Payment completed successfully.",
+            "category": category,
+            "is_fraud": False,
+            "receiver": receiver_username
+        })
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/get-payments", methods=["POST"])
+def get_payments():
+    data = request.get_json()
+    username = data["username"]
+    
+    user = supabase.table("users").select("*").eq("username", username).execute().data[0]
+    user_id = user["id"]
+    
+    result = supabase.table("payments").select("*").eq("user_id", user_id).order("timestamp", desc=True).execute()
+    return jsonify({"success": True, "payments": result.data})
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
