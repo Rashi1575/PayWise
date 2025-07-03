@@ -253,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "index.html";
   });
 
-    // NEW
 
   function loadProfile() {
     const username = localStorage.getItem("username");
@@ -310,4 +309,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
 
+});
+
+  document.getElementById("submitPayment")?.addEventListener("click", async () => {
+    const receiver = document.getElementById("receiverUsername").value;
+    const amount = parseFloat(document.getElementById("payAmount").value);
+    const desc = document.getElementById("payDesc").value;
+    const method = document.getElementById("payMethod").value;
+    const sender = localStorage.getItem("username");  // logged-in user
+
+    if (!receiver || !amount || !desc) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    const res = await fetch("http://localhost:5000/make-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sender,
+        receiver,
+        amount,
+        description: desc,
+        payment_method: method
+      })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById("payStatus").textContent = 
+      `✅ Payment successful! Category: ${data.category} | Fraud: ${data.is_fraud ? 'Yes' : 'No'}`;
+  } else {
+    document.getElementById("payStatus").textContent = `❌ Error: ${data.error}`;
+  }
+  });
+
+  async function loadPayments() {
+  const username = localStorage.getItem("username");
+  const res = await fetch("http://localhost:5000/get-payments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+
+  const data = await res.json();
+  if (data.success) renderTable(data.payments);
+}
+
+document.getElementById("paymentHistoryBtn").addEventListener("click", async (e) => {
+  e.preventDefault();
+  document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+  const section = document.getElementById("payment-history-section");
+  section.style.display = "block";
+  await loadPayments();
 });
