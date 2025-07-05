@@ -1,4 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
+  //new Kpish
+  const payMethodSelect = document.getElementById("payMethod");
+  const extraDiv = document.getElementById("paymentDetailsExtra");
+
+  payMethodSelect.addEventListener("change", () => {
+    const method = payMethodSelect.value;
+    if (method === "UPI") {
+      extraDiv.innerHTML = `
+        <input type="text" id="extraField1" placeholder="Enter UPI ID (e.g., name@upi)" />
+      `;
+    } else if (method === "Net Banking") {
+      extraDiv.innerHTML = `
+        <select id="extraField1">
+          <option selected disabled>Select Bank</option>
+          <option>HDFC</option>
+          <option>ICICI</option>
+          <option>SBI</option>
+          <option>Axis</option>
+        </select>
+        <input type="text" id="extraField2" placeholder="Enter IFSC Code" />
+      `;
+    } else {
+      extraDiv.innerHTML = "";
+    }
+  });
+
+// Load initial field
+payMethodSelect.dispatchEvent(new Event("change"));
+
+
   /* ───────────────── HELPERS ───────────────── */
   const sections = Array.from(document.querySelectorAll("main section"));
   const showOnly = (...els) => {
@@ -84,12 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
   /*-------------Profile Section ---------- */
   const profileLink = document.getElementById("profileLink");
   const profileSection = document.getElementById("profile-section");
-
+  //new kpish
   profileLink.addEventListener("click", (e) => {
     e.preventDefault();
     document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
     profileSection.style.display = "block";
-  });
+    loadProfile();  // ✅ Load profile data from Supabase
+});
 
   const rewardsLink = document.getElementById("rewardsLink");
   const rewardsSection = document.getElementById("rewards-section");
@@ -310,39 +341,61 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
 
 });
-
+  //new Kpish
   document.getElementById("submitPayment")?.addEventListener("click", async () => {
     const receiver = document.getElementById("receiverUsername").value;
-    const amount = parseFloat(document.getElementById("payAmount").value);
+    const amount = document.getElementById("payAmount").value.trim();
     const desc = document.getElementById("payDesc").value;
     const method = document.getElementById("payMethod").value;
-    const sender = localStorage.getItem("username");  // logged-in user
+    const sender = localStorage.getItem("username");
 
-    if (!receiver || !amount || !desc) {
-      alert("Please fill all fields.");
+    const payStatus = document.getElementById("payStatus");
+    const loader = document.getElementById("paymentLoader");
+
+    // Validate inputs
+    if (!receiver || !amount || !desc || isNaN(amount) || amount <= 0) {
+      alert("Please fill all fields correctly.");
       return;
     }
 
-    const res = await fetch("http://localhost:5000/make-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sender,
-        receiver,
-        amount,
-        description: desc,
-        payment_method: method
-      })
+    // Show loader
+    payStatus.textContent = "";
+    loader.style.display = "block";
+
+    // Simulate fake processing delay
+    setTimeout(async () => {
+      try {
+        const res = await fetch("http://localhost:5000/make-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sender,
+            receiver,
+            amount: parseFloat(amount),
+            description: desc,
+            payment_method: method
+          })
+        });
+
+        const data = await res.json();
+        loader.style.display = "none";
+
+        if (data.success) {
+          payStatus.textContent = "✅ Transaction successful!";
+          document.getElementById("receiverUsername").value = "";
+          document.getElementById("payAmount").value = "";
+          document.getElementById("payDesc").value = "";
+          document.getElementById("paymentDetailsExtra").innerHTML = "";
+        } else {
+          payStatus.textContent = `❌ Error: ${data.error}`;
+        }
+      } catch (err) {
+        loader.style.display = "none";
+        payStatus.textContent = "❌ Server error: " + err.message;
+      }
+    }, 2000);
   });
 
-  const data = await res.json();
-  if (data.success) {
-    document.getElementById("payStatus").textContent = 
-      `✅ Payment successful! Category: ${data.category} | Fraud: ${data.is_fraud ? 'Yes' : 'No'}`;
-  } else {
-    document.getElementById("payStatus").textContent = `❌ Error: ${data.error}`;
-  }
-  });
 
   async function loadPayments() {
   const username = localStorage.getItem("username");
@@ -362,4 +415,7 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
   const section = document.getElementById("payment-history-section");
   section.style.display = "block";
   await loadPayments();
+  //new kpish
+  loadProfile();
+
 });
