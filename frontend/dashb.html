@@ -44,10 +44,18 @@
           <input type="text" id="receiverUsername" placeholder="Pay to (username)" />
           <input type="number" id="payAmount" placeholder="Enter amount" />
           <input type="text" id="payDesc" placeholder="Enter description" />
+          <!--new Kpish -->
           <select id="payMethod">
             <option value="UPI">UPI</option>
             <option value="Net Banking">Net Banking</option>
           </select>
+          <!-- Dynamic input area -->
+          <div id="paymentDetailsExtra" style="width: 100%; margin-top: 10px;"></div>
+
+          <!-- Loader -->
+          <div id="paymentLoader" style="display: none; margin-top: 10px;">
+            <span class="loader"></span> Processing your payment...
+          </div>
           <button id="submitPayment">Submit Payment</button>
           <div id="payStatus" class="payment-status"></div>
         </div>
