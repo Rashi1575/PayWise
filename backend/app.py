@@ -227,22 +227,22 @@ def make_payment():
             "timestamp": timestamp
         }
         is_fraud = amount > 10000  # Or use your ML model here
-
+        #newKpish
         if is_fraud:
             # Log the blocked fraud attempt (optional but useful)
             supabase.table("payments").insert({
                 "user_id": sender["username"],
-                "amount": amount,
+                "withdrawal": amount,
                 "category": category,
                 "description": desc,
                 "payment_method": method,
-                "timestamp": timestamp,
+                "date": timestamp,
                 "is_fraud": True
             }).execute()
-
+            #new kpish
             return jsonify({
                 "success": False,
-                "error": "⚠️ Fraud detected. Payment has been blocked.",
+                "error": "⚠️ Transaction declined: Amount exceeds the permitted limit of ₹10,000.",
                 "is_fraud": True
             }), 403
 
@@ -252,15 +252,15 @@ def make_payment():
 
         supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender["username"]).execute()
         supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver["username"]).execute()
-
+        #new Kpish
         # --- 5. Insert legit transaction in payments table ---
         supabase.table("payments").insert({
             "user_id": sender["username"],
-            "amount": amount,
+            "withdrawal": amount,
             "category": category,
             "description": desc,
             "payment_method": method,
-            "timestamp": timestamp,
+            "date": timestamp,
             "is_fraud": False
         }).execute()
 
