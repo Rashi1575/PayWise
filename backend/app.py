@@ -165,6 +165,7 @@ def update_profile():
 expense_clf = joblib.load("expense_classifier_model.pkl")
 vectorizer = joblib.load("vectorizer.pkl")  # If you saved it separately
 fraud_model = joblib.load("fraud_model.pkl")
+@app.route("/make-payment", methods=["POST"])
 
 @app.route("/make-payment", methods=["POST"])
 def make_payment():
@@ -177,7 +178,7 @@ def make_payment():
         method = data["payment_method"]
         timestamp = str(datetime.datetime.utcnow())
 
-        # --- 1. Fetch sender and receiver from Supabase ---
+        # --- Fetch sender and receiver from Supabase ---
         sender_res = supabase.table("users").select("*").eq("username", sender_username).execute()
         receiver_res = supabase.table("users").select("*").eq("username", receiver_username).execute()
 
@@ -190,7 +191,7 @@ def make_payment():
         if sender["balance"] < amount:
             return jsonify({"success": False, "error": "Insufficient balance"}), 400
 
-        # --- 2. Predict category using ML ---
+        # --- Predict category using ML ---
         cleaned_desc = desc.lower()
         tfidf = vectorizer.transform([cleaned_desc])
         category = expense_clf.predict(tfidf)[0]
@@ -211,26 +212,25 @@ def make_payment():
         }
         category = CATEGORY_MAP.get(category, "Others")
 
-        # --- 3. Fraud detection (basic rule or ML) ---
-        transaction = {
-            "amount": amount,
-            "description": desc,
-            "payment_method": method,
-            "user_id": sender["username"],
-            "timestamp": timestamp
-        }
-        is_fraud = amount > 10000  # Or use your ML model here
+        # --- Fraud detection ---
+        is_fraud = amount > 10000
+
+        txn_id = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
+        new_sender_balance = sender["balance"] - amount
+        new_receiver_balance = receiver["balance"] + amount
 
         if is_fraud:
-            # Log the blocked fraud attempt (optional but useful)
             supabase.table("payments").insert({
-                "user_id": sender["username"],
+                "user_id": sender_username,
+                "username": sender_username,
                 "withdrawal": amount,
                 "category": category,
                 "description": desc,
                 "payment_method": method,
                 "date": timestamp,
-                "is_fraud": True
+                "transaction_id": txn_id,
+                "is_fraud": True,
+                "closing_balance": sender["balance"]  # balance remains unchanged
             }).execute()
 
             return jsonify({
@@ -239,22 +239,22 @@ def make_payment():
                 "is_fraud": True
             }), 403
 
-        # --- 4. Update balances (only if not fraud) ---
-        new_sender_balance = sender["balance"] - amount
-        new_receiver_balance = receiver["balance"] + amount
+        # --- Update balances ---
+        supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender_username).execute()
+        supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver_username).execute()
 
-        supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender["username"]).execute()
-        supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver["username"]).execute()
-
-        # --- 5. Insert legit transaction in payments table ---
+        # --- Insert transaction ---
         supabase.table("payments").insert({
-            "user_id": sender["username"],
+            "user_id": sender_username,
+            "username": sender_username,
             "withdrawal": amount,
             "category": category,
             "description": desc,
             "payment_method": method,
             "date": timestamp,
-            "is_fraud": False
+            "transaction_id": txn_id,
+            "is_fraud": False,
+            "closing_balance": new_sender_balance
         }).execute()
 
         return jsonify({
@@ -268,16 +268,16 @@ def make_payment():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+
 @app.route("/get-payments", methods=["POST"])
 def get_payments():
     data = request.get_json()
     username = data["username"]
-    
-    user = supabase.table("users").select("*").eq("username", username).execute().data[0]
-    user_id = user["id"]
-    
-    result = supabase.table("payments").select("*").eq("user_id", user_id).order("timestamp", desc=True).execute()
+
+    result = supabase.table("payments").select("*").eq("username", username).order("date", desc=True).execute()
+
     return jsonify({"success": True, "payments": result.data})
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
