@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  //new Kpish
   const payMethodSelect = document.getElementById("payMethod");
   const extraDiv = document.getElementById("paymentDetailsExtra");
 
@@ -28,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // Load initial field
 payMethodSelect.dispatchEvent(new Event("change"));
 
-
   /* ───────────────── HELPERS ───────────────── */
   const sections = Array.from(document.querySelectorAll("main section"));
   const showOnly = (...els) => {
@@ -55,6 +53,14 @@ payMethodSelect.dispatchEvent(new Event("change"));
         }
       }
     }
+  });
+
+  // Make Payment link
+  const makePaymentLink = document.getElementById("makePaymentLink");
+  makePaymentLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+    paymentSection.style.display = "block";
   });
 
 
@@ -107,19 +113,17 @@ payMethodSelect.dispatchEvent(new Event("change"));
     allSections.forEach(sec => sec.style.display = "none");
 
     // Show dashboard sections
-    paymentSection.style.display = "block";
     insightsSection.style.display = "block";
   });
 
   /*-------------Profile Section ---------- */
   const profileLink = document.getElementById("profileLink");
   const profileSection = document.getElementById("profile-section");
-  //new kpish
   profileLink.addEventListener("click", (e) => {
     e.preventDefault();
     document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
     profileSection.style.display = "block";
-    loadProfile();  // ✅ Load profile data from Supabase
+    loadProfile();  //Load profile data from Supabase
 });
 
   const rewardsLink = document.getElementById("rewardsLink");
@@ -131,7 +135,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
     sections.forEach(sec => sec.style.display = "none");
     rewardsSection.style.display = "block";
 
-    // ⬇️ Replace with actual highest category if needed
+    // Replace with actual highest category if needed
     const categoryData = {
       labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
       data: [5000, 2000, 1500, 3000, 1000]
@@ -171,20 +175,13 @@ payMethodSelect.dispatchEvent(new Event("change"));
   }
 
   /* ───────────────── DASHBOARD (HOME & LOGO) NAV ───────────────── */
-  const paymentSect  = document.querySelector(".payment-section");
-  const insightsSect = document.querySelector(".insights-section");
-
-  // Home link
-  document.getElementById("homeLink")?.addEventListener("click", e => {
-    e.preventDefault();
-    showOnly(paymentSect, insightsSect);
-  });
-
-  // PayWise logo link
+  
   document.getElementById("paywiseLink")?.addEventListener("click", e => {
     e.preventDefault();
-    showOnly(paymentSect, insightsSect);
+    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+    document.getElementById("insights-section").style.display = "block";
   });
+
 
   const aboutLink = document.getElementById("aboutLink");
   const aboutSection = document.getElementById("about-section");
@@ -341,7 +338,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
 
 });
-  //new Kpish
+
   document.getElementById("submitPayment")?.addEventListener("click", async () => {
     const receiver = document.getElementById("receiverUsername").value;
     const amount = document.getElementById("payAmount").value.trim();
@@ -415,7 +412,6 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
   const section = document.getElementById("payment-history-section");
   section.style.display = "block";
   await loadPayments();
-  //new kpish
   loadProfile();
 
 });
