@@ -11,11 +11,11 @@
   <div class="dashboard-container">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <!-- ✅ PayWise logo (clickable) -->
       <ul>
         <li style="margin-bottom: 40px;">
           <a href="#" id="paywiseLink" style="font-size: 30px; font-weight: bold; color: #00c9a7; text-decoration: none;">PayWise</a>
         </li>
+        <li><a href="#" id="makePaymentLink">Make Payment</a></li>
         <li><a href="#" id="profileLink">Profile</a></li>
         <li><a href="#" id="paymentHistoryBtn">Payment History</a></li>
         <li><a href="#" id="budgetLink">Budget</a></li>
@@ -38,13 +38,12 @@
       <h1>Dashboard</h1>
 
       <!-- Payment Section -->
-      <section class="payment-section" id="payment-section">
+      <section class="payment-section" id="payment-section" style="display: none;">
         <h2>Make a Payment</h2>
         <div class="payment-form">
           <input type="text" id="receiverUsername" placeholder="Pay to (username)" />
           <input type="number" id="payAmount" placeholder="Enter amount" />
           <input type="text" id="payDesc" placeholder="Enter description" />
-          <!--new Kpish -->
           <select id="payMethod">
             <option value="UPI">UPI</option>
             <option value="Net Banking">Net Banking</option>
@@ -59,43 +58,31 @@
           <button id="submitPayment">Submit Payment</button>
           <div id="payStatus" class="payment-status"></div>
         </div>
-
+        <!-- <div class="payment-form">
+          <input type="text" id="receiverUsername" placeholder="Pay to (username)" />
+          <input type="number" id="payAmount" placeholder="Enter amount" />
+          <input type="text" id="payDesc" placeholder="Enter description" />
+          <select id="payMethod">
+            <option value="UPI">UPI</option>
+            <option value="Net Banking">Net Banking</option>
+          </select>
+          <button id="submitPayment">Submit Payment</button>
+          <div id="payStatus" class="payment-status"></div>
+        </div> -->
         <div id="payStatus" style="margin-top: 10px; font-weight: bold;"></div>
       </section>
 
       <!-- Spending Insights -->
-      <section class="insights-section">
+      <section class="insights-section" id="insights-section">
         <h2>Spending Insights</h2>
-
         <div class="insights-grid">
-          <!-- Textual insights -->
           <div class="insight-cards">
             <div class="card">Total Monthly Spending: ₹12,500</div>
             <div class="card">Highest Spending Category: Food</div>
             <div class="card">Suggested Savings: Dining, Entertainment</div>
           </div>
-
-          <!-- Chart area -->
           <div class="chart-container">
-            <div class="chart-header">
-              <select id="insight-month">
-                <option value="january">January</option>
-                <option value="february">February</option>
-                <option value="march">March</option>
-                <option value="march">April</option>
-                <option value="march">May</option>
-                <option value="march">June</option>
-                <option value="march">July</option>
-                <option value="march">August</option>
-                <option value="march">September</option>
-                <option value="march">October</option>
-                <option value="march">November</option>
-                <option value="march">December</option>
-              </select>
-            </div>
-
             <canvas id="spendingChart" width="300" height="300"></canvas>
-
             <div id="chart-legend">
               <ul>
                 <li><span class="dot food"></span> Food</li>
@@ -109,7 +96,9 @@
         </div>
       </section>
 
-      <!-- Budget Section -->
+      <!-- All other sections remain unchanged -->
+      <!-- Include budget, profile, rewards, about, and payment-history sections as you already have them -->
+       <!-- Budget Section -->
       <section class="budget-section" id="budget-section" style="display: none;">
         <h2>Budget</h2>
         <div class="budget-grid">
@@ -220,8 +209,7 @@
           </tbody>
         </table>
       </section>
-
-      
+   
       <section class="rewards-section" id="rewards-section" style="display: none;">
         <h2>Rewards</h2>
 
@@ -259,9 +247,13 @@
         </div>
       </section>
 
-
     </main>
   </div>
+
+  <script src="dashb.js"></script>
+</body>
+</html>
+
 
   <script src="dashb.js"></script>
 </body>
