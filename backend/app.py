@@ -55,7 +55,6 @@ def login():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 401
 
-
 # Forgot Password Route
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
@@ -70,8 +69,6 @@ def forgot_password():
         return jsonify({"success": True, "message": "Password reset!"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
-
-
 
 @app.route('/get-email', methods=['POST'])
 def get_email_by_username():
@@ -164,10 +161,6 @@ def update_profile():
     else:
         return jsonify({"success": False, "error": response.text}), 400
 
-
-
-
-
 # Load ML models
 expense_clf = joblib.load("expense_classifier_model.pkl")
 vectorizer = joblib.load("vectorizer.pkl")  # If you saved it separately
@@ -227,7 +220,7 @@ def make_payment():
             "timestamp": timestamp
         }
         is_fraud = amount > 10000  # Or use your ML model here
-        #newKpish
+
         if is_fraud:
             # Log the blocked fraud attempt (optional but useful)
             supabase.table("payments").insert({
@@ -239,7 +232,7 @@ def make_payment():
                 "date": timestamp,
                 "is_fraud": True
             }).execute()
-            #new kpish
+
             return jsonify({
                 "success": False,
                 "error": "⚠️ Transaction declined: Amount exceeds the permitted limit of ₹10,000.",
@@ -252,7 +245,7 @@ def make_payment():
 
         supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender["username"]).execute()
         supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver["username"]).execute()
-        #new Kpish
+
         # --- 5. Insert legit transaction in payments table ---
         supabase.table("payments").insert({
             "user_id": sender["username"],
@@ -285,10 +278,6 @@ def get_payments():
     
     result = supabase.table("payments").select("*").eq("user_id", user_id).order("timestamp", desc=True).execute()
     return jsonify({"success": True, "payments": result.data})
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
