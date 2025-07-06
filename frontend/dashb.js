@@ -1,4 +1,32 @@
+function renderTable(data) {
+      const tbody = document.querySelector("#paymentTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(txn => {
+        const row = document.createElement("tr");
+
+        const date = new Date(txn.date).toLocaleDateString("en-IN");
+        const withdrawal = txn.withdrawal ? `₹${txn.withdrawal}` : "-";
+        const deposit = txn.deposit ? `₹${txn.deposit}` : "-";
+        const closing = txn.closing_balance !== null ? `₹${txn.closing_balance}` : "-";
+
+        row.innerHTML = `
+          <td>${txn.transaction_id || "-"}</td>
+          <td>${date}</td>
+          <td>${txn.description || "-"}</td>
+          <td>${withdrawal}</td>
+          <td>${deposit}</td>
+          <td>${txn.category}</td>
+          <td>${closing}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
 document.addEventListener("DOMContentLoaded", () => {
+
+
   const payMethodSelect = document.getElementById("payMethod");
   const extraDiv = document.getElementById("paymentDetailsExtra");
 
@@ -193,57 +221,27 @@ payMethodSelect.dispatchEvent(new Event("change"));
     aboutSection.style.display = "block";
   });
 
-  // ───────────────────── LOGOUT ─────────────────────
-  const payments = [
-  {
-    id: "TXN001",
-    date: "2025-06-12",
-    type: "Grocery Shopping",
-    withdrawal: 2000,
-    deposit: 0,
-    category: "Groceries",
-    closing: 8000
-  },
-  {
-    id: "TXN002",
-    date: "2025-05-28",
-    type: "Salary",
-    withdrawal: 0,
-    deposit: 15000,
-    category: "Income",
-    closing: 18000
-  },
-  // Add more dummy records
-    ];
 
-    function renderTable(data) {
-      const tbody = document.querySelector("#paymentTable tbody");
-      tbody.innerHTML = ""; // Clear previous rows
+    document.getElementById("monthSelect").addEventListener("change", async function () {
+    const selected = this.value;
+    const username = localStorage.getItem("username");
 
-      data.forEach(txn => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${txn.id}</td>
-          <td>${txn.date}</td>
-          <td>${txn.type}</td>
-          <td>${txn.withdrawal || '-'}</td>
-          <td>${txn.deposit || '-'}</td>
-          <td>${txn.category}</td>
-          <td>${txn.closing}</td>
-        `;
-        tbody.appendChild(row);
-      });
+    const res = await fetch("http://localhost:5000/get-payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    if (!data.success) return alert("❌ Error loading payments");
+
+    let filtered = data.payments;
+    if (selected !== "all") {
+      filtered = filtered.filter(txn => txn.date.startsWith(selected));
     }
 
-    document.getElementById("monthSelect").addEventListener("change", function () {
-      const selected = this.value;
-      if (selected === "all") {
-        renderTable(payments);
-      } else {
-        const filtered = payments.filter(txn => txn.date.startsWith(selected));
-        renderTable(filtered);
-      }
-    });
+    renderTable(filtered);
+  });
 
     // Load default table
     renderTable(payments);
@@ -301,7 +299,6 @@ payMethodSelect.dispatchEvent(new Event("change"));
         }
       });
   }
-
 
   function saveProfileData() {
     const username = localStorage.getItem("username");
