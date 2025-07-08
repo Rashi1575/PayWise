@@ -221,7 +221,6 @@ def make_payment():
 
         if is_fraud:
             supabase.table("payments").insert({
-                "user_id": sender_username,
                 "username": sender_username,
                 "withdrawal": amount,
                 "category": category,
@@ -245,7 +244,6 @@ def make_payment():
 
         # --- Insert transaction ---
         supabase.table("payments").insert({
-            "user_id": sender_username,
             "username": sender_username,
             "withdrawal": amount,
             "category": category,
@@ -277,9 +275,6 @@ def get_payments():
     result = supabase.table("payments").select("*").eq("username", username).order("date", desc=True).execute()
 
     return jsonify({"success": True, "payments": result.data})
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
