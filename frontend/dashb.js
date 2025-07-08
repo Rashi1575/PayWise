@@ -1,28 +1,51 @@
+
+function loadProfile() {
+  const username = localStorage.getItem("username");
+  if (!username) return;
+
+  fetch(`http://localhost:5000/profile/${username}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const profile = data.data;
+        document.getElementById("username").textContent = username;
+        document.getElementById("fullName").value = profile.full_name || "";
+        document.getElementById("email").value = profile.email || "";
+        document.getElementById("phone").value = profile.phone || "";
+        document.getElementById("gender").value = profile.gender || "";
+        document.getElementById("nationality").value = profile.nationality || "";
+        document.getElementById("address").value = profile.address || "";
+      }
+    });
+}
+
+
 function renderTable(data) {
-      const tbody = document.querySelector("#paymentTable tbody");
-      tbody.innerHTML = "";
+  const tbody = document.querySelector("#paymentTable tbody");
+  tbody.innerHTML = "";
 
-      data.forEach(txn => {
-        const row = document.createElement("tr");
+  data.forEach(txn => {
+    const row = document.createElement("tr");
 
-        const date = new Date(txn.date).toLocaleDateString("en-IN");
-        const withdrawal = txn.withdrawal ? `₹${txn.withdrawal}` : "-";
-        const deposit = txn.deposit ? `₹${txn.deposit}` : "-";
-        const closing = txn.closing_balance !== null ? `₹${txn.closing_balance}` : "-";
+    const date = new Date(txn.date).toLocaleDateString("en-IN");
+    const withdrawal = txn.withdrawal != null ? `₹${txn.withdrawal}` : "-";
+    const deposit = txn.deposit != null ? `₹${txn.deposit}` : "-";
+    const closing = txn.closing_balance != null ? `₹${txn.closing_balance}` : "-";
 
-        row.innerHTML = `
-          <td>${txn.transaction_id || "-"}</td>
-          <td>${date}</td>
-          <td>${txn.description || "-"}</td>
-          <td>${withdrawal}</td>
-          <td>${deposit}</td>
-          <td>${txn.category}</td>
-          <td>${closing}</td>
-        `;
+    row.innerHTML = `
+      <td>${txn.transaction_id || "-"}</td>
+      <td>${date}</td>
+      <td>${txn.description || "-"}</td>
+      <td>${withdrawal}</td>
+      <td>${deposit}</td>
+      <td>${txn.category}</td>
+      <td>${closing}</td>
+    `;
 
-        tbody.appendChild(row);
-      });
-    }
+    tbody.appendChild(row);
+  });
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -147,10 +170,10 @@ payMethodSelect.dispatchEvent(new Event("change"));
   /*-------------Profile Section ---------- */
   const profileLink = document.getElementById("profileLink");
   const profileSection = document.getElementById("profile-section");
-  profileLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
-    profileSection.style.display = "block";
+  // profileLink.addEventListener("click", (e) => {
+  //   e.preventDefault();
+  //   document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+  //   profileSection.style.display = "block";
     loadProfile();  //Load profile data from Supabase
 });
 
@@ -243,9 +266,6 @@ payMethodSelect.dispatchEvent(new Event("change"));
     renderTable(filtered);
   });
 
-    // Load default table
-    renderTable(payments);
-
     document.getElementById("paymentHistoryBtn").addEventListener("click", function (e) {
     e.preventDefault();
 
@@ -259,7 +279,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
 
     // Optional: Reset month filter and render table again
     document.getElementById("monthSelect").value = "all";
-    renderTable(payments);
+    // renderTable(payments);
   });
 
   document.getElementById("togglePayMode").addEventListener("click", () => {
@@ -271,34 +291,11 @@ payMethodSelect.dispatchEvent(new Event("change"));
   // ───────────────────── LOGOUT ─────────────────────
   document.getElementById("logoutLink")?.addEventListener("click", (e) => {
     e.preventDefault();
-
-    // Optional: clear any saved session data
-    localStorage.removeItem("dark-mode"); // or any user info you stored
-
-    // Redirect to login page
-    window.location.href = "index.html";
+    console.log("Logging out...");
+    localStorage.removeItem("username");
+    localStorage.removeItem("dark-mode");
+    window.location.href = "index.html";  // or "login.html" if separate
   });
-
-
-  function loadProfile() {
-    const username = localStorage.getItem("username");
-    if (!username) return;
-
-    fetch(`http://localhost:5000/profile/${username}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const profile = data.data;
-          document.getElementById("username").textContent = username;
-          document.getElementById("fullName").value = profile.full_name || "";
-          document.getElementById("email").value = profile.email || "";
-          document.getElementById("phone").value = profile.phone || "";
-          document.getElementById("gender").value = profile.gender || "";
-          document.getElementById("nationality").value = profile.nationality || "";
-          document.getElementById("address").value = profile.address || "";
-        }
-      });
-  }
 
   function saveProfileData() {
     const username = localStorage.getItem("username");
@@ -334,7 +331,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
 
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
 
-});
+
 
   document.getElementById("submitPayment")?.addEventListener("click", async () => {
     const receiver = document.getElementById("receiverUsername").value;
