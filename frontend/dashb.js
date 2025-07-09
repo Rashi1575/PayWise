@@ -45,10 +45,70 @@ function renderTable(data) {
     tbody.appendChild(row);
   });
 }
+// NEW
+function getSuggestions(category) {
+  const map = {
+    "Food and Grocery": "Dining, Fast Food",
+    "Transportation": "Cabs, Fuel",
+    "Shopping": "Clothes, Online Orders",
+    "Housing and Bills": "Electricity, Rent",
+    "Healthcare": "Medicine, Tests",
+    "Entertainment": "Movies, OTT",
+    "Education": "Tuition, Courses",
+    "Others": "Review all expenses"
+  };
+  return map[category] || "Review all expenses";
+}
 
+async function loadSpendingInsights() {
+  const username = localStorage.getItem("username");
+  if (!username) return;
+
+  const res = await fetch("http://localhost:5000/spending-insights", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+
+  const data = await res.json();
+  if (!data.success) return alert("❌ Error fetching insights");
+
+  const { total_spent, category_totals, highest_category } = data;
+
+  // Update insight cards
+  document.querySelector(".card:nth-child(1)").textContent = `Total Monthly Spending: ₹${total_spent}`;
+  document.querySelector(".card:nth-child(2)").textContent = `Highest Spending Category: ${highest_category}`;
+  document.querySelector(".card:nth-child(3)").textContent = `Suggested Savings: ${getSuggestions(highest_category)}`;
+
+  // Update chart
+  const labels = Object.keys(category_totals);
+  const values = Object.values(category_totals);
+  const colors = ['#00bfa5','#00acc1','#ffa726','#ef5350','#ab47bc','#42a5f5','#66bb6a','#ff7043'];
+
+  if (spendingChart) spendingChart.destroy();
+
+  const ctx = document.getElementById('spendingChart').getContext('2d');
+  spendingChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors.slice(0, labels.length)
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+let spendingChart; // holds the pie chart instance
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  
 
   const payMethodSelect = document.getElementById("payMethod");
   const extraDiv = document.getElementById("paymentDetailsExtra");
@@ -86,25 +146,25 @@ payMethodSelect.dispatchEvent(new Event("change"));
   };
 
   const ctx = document.getElementById('spendingChart').getContext('2d');
-  const spendingChart = new Chart(ctx, {
+  spendingChart = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: ['Food', 'Transport', 'Utilities', 'Shopping', 'Others'],
+      labels: [], // Initially empty
       datasets: [{
-        label: 'Spending',
-        data: [5000, 2000, 1500, 3000, 1000],
-        backgroundColor: ['#00bfa5', '#00acc1', '#ffa726', '#ef5350', '#ab47bc'],
+        data: [],
+        backgroundColor: []
       }]
     },
     options: {
       responsive: true,
       plugins: {
         legend: {
-          display: false // Because you’re using a custom legend
+          display: false
         }
       }
     }
   });
+
 
   // Make Payment link
   const makePaymentLink = document.getElementById("makePaymentLink");
@@ -231,6 +291,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
     e.preventDefault();
     document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
     document.getElementById("insights-section").style.display = "block";
+    loadSpendingInsights(); 
   });
 
 
