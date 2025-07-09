@@ -112,9 +112,52 @@
             <button id="saveBudget">Save</button>
           </div>
 
-          <div class="budget-box">
+          <div class="budget-box" id="target-tracker-box">
             <h3>Target Tracker</h3>
-            <p>Need to buy <strong>Lambo</strong></p>
+
+            <!-- Goal Info -->
+            <div class="target-info">
+              <p>🎯 <strong>Goal:</strong> <span id="target-title">Buy Lambo</span></p>
+              <p>💰 <strong>Target:</strong> ₹<span id="target-amount">500000</span></p>
+              <p>💾 <strong>Saved:</strong> ₹<span id="target-saved">180000</span></p>
+              <p>🗓 <strong>Deadline:</strong> <span id="target-deadline">10 Oct 2025</span></p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+              <div class="progress-bar" id="savings-progress-bar">
+                <div class="progress-fill" id="savings-progress-fill" style="width: 36%;"></div>
+              </div>
+              <p class="progress-text" id="savings-progress-text">36% completed</p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="target-buttons">
+              <button id="edit-target-btn">Edit Target</button>
+              <button id="delete-target-btn" class="danger-btn">Delete</button>
+            </div>
+
+            <!-- Alert for deadlines -->
+            <div class="target-alert" id="deadline-alert" style="display: none;">
+              ⚠ Your goal "<span id="alert-title"></span>" is due in <span id="alert-days"></span> days!
+            </div>
+
+            <!-- Edit Form (hidden by default) -->
+            <div class="target-form" id="edit-target-form" style="display: none;">
+              <label for="edit-title">Target Title:</label>
+              <input type="text" id="edit-title" />
+
+              <label for="edit-amount">Target Amount:</label>
+              <input type="number" id="edit-amount" />
+
+              <label for="edit-deadline">Deadline:</label>
+              <input type="date" id="edit-deadline" />
+
+              <label for="edit-saved">Amount Saved:</label>
+              <input type="number" id="edit-saved" />
+
+              <button id="save-target-btn">Save Target</button>
+            </div>
           </div>
 
           <div class="budget-box">
@@ -172,11 +215,18 @@
         <label for="monthSelect">Select Month:</label>
         <select id="monthSelect">
           <option value="all">All Months</option>
-          <option value="2025-06">August 2025</option>
-          <option value="2025-06">July 2025</option>
-          <option value="2025-06">June 2025</option>
-          <option value="2025-05">May 2025</option>
-          <option value="2025-04">April 2025</option>
+          <option value="2025-12">December</option>
+          <option value="2025-11">November</option>
+          <option value="2025-10">October</option>
+          <option value="2025-09">September</option>
+          <option value="2025-08">August</option>
+          <option value="2025-07">July</option>
+          <option value="2025-06">June</option>
+          <option value="2025-05">May</option>
+          <option value="2025-04">April</option>
+          <option value="2025-03">March</option>
+          <option value="2025-02">February</option>
+          <option value="2025-01">January</option>
           <!-- Add more months as needed -->
         </select>
 
@@ -241,3 +291,4 @@
   <script src="dashb.js"></script>
 </body>
 </html>
+
