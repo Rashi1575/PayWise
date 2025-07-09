@@ -276,6 +276,44 @@ def get_payments():
 
     return jsonify({"success": True, "payments": result.data})
 
+@app.route("/spending-insights", methods=["POST"])
+def spending_insights():
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+
+    try:
+        # Fetch user's payments (excluding fraud)
+        result = supabase.table("payments") \
+            .select("category, withdrawal") \
+            .eq("username", username) \
+            .eq("is_fraud", False) \
+            .execute()
+
+        payments = result.data
+        category_totals = {}
+        total_spent = 0
+
+        for txn in payments:
+            cat = txn["category"]
+            amt = txn["withdrawal"] or 0
+            category_totals[cat] = category_totals.get(cat, 0) + amt
+            total_spent += amt
+
+        # Determine highest category
+        highest_category = max(category_totals.items(), key=lambda x: x[1])[0] if category_totals else "N/A"
+
+        # Return data
+        return jsonify({
+            "success": True,
+            "total_spent": total_spent,
+            "category_totals": category_totals,
+            "highest_category": highest_category
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 if __name__ == '__main__':
