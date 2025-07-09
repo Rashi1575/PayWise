@@ -108,7 +108,6 @@ let spendingChart; // holds the pie chart instance
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  
 
   const payMethodSelect = document.getElementById("payMethod");
   const extraDiv = document.getElementById("paymentDetailsExtra");
@@ -230,34 +229,35 @@ payMethodSelect.dispatchEvent(new Event("change"));
   /*-------------Profile Section ---------- */
   const profileLink = document.getElementById("profileLink");
   const profileSection = document.getElementById("profile-section");
-  // profileLink.addEventListener("click", (e) => {
-  //   e.preventDefault();
-  //   document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
-  //   profileSection.style.display = "block";
-    loadProfile();  //Load profile data from Supabase
-});
+
+  if (profileLink && profileSection) {
+    profileLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showOnly(profileSection);  // reuse your own helper
+      loadProfile();             // fetch from backend
+      loadProfile();  // Now it runs when you open the section
+    });
+  }
 
   const rewardsLink = document.getElementById("rewardsLink");
   const rewardsSection = document.getElementById("rewards-section");
-  const highestCategoryEl = document.getElementById("highestCategory");
 
-  rewardsLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    sections.forEach(sec => sec.style.display = "none");
-    rewardsSection.style.display = "block";
+  if (rewardsLink && rewardsSection) {
+    rewardsLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showOnly(rewardsSection);
 
-    // Replace with actual highest category if needed
-    const categoryData = {
-      labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
-      data: [5000, 2000, 1500, 3000, 1000]
-    };
+      const categoryData = {
+        labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
+        data: [5000, 2000, 1500, 3000, 1000]
+      };
 
-    const maxIndex = categoryData.data.indexOf(Math.max(...categoryData.data));
-    const topCategory = categoryData.labels[maxIndex];
-    highestCategoryEl.textContent = topCategory;
+      const maxIndex = categoryData.data.indexOf(Math.max(...categoryData.data));
+      const topCategory = categoryData.labels[maxIndex];
+      document.getElementById("highestCategory").textContent = topCategory;
+    });
+  }
 
-    // Optionally: you can change offers dynamically here as well!
-  });
 
   function copyReferral() {
   navigator.clipboard.writeText("PAYWISE123");
@@ -305,27 +305,50 @@ payMethodSelect.dispatchEvent(new Event("change"));
     aboutSection.style.display = "block";
   });
 
+  document.getElementById("monthSelect").addEventListener("change", async function () {
+  const selected = this.value;
+  const username = localStorage.getItem("username");
 
-    document.getElementById("monthSelect").addEventListener("change", async function () {
-    const selected = this.value;
-    const username = localStorage.getItem("username");
-
-    const res = await fetch("http://localhost:5000/get-payments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-
-    const data = await res.json();
-    if (!data.success) return alert("❌ Error loading payments");
-
-    let filtered = data.payments;
-    if (selected !== "all") {
-      filtered = filtered.filter(txn => txn.date.startsWith(selected));
-    }
-
-    renderTable(filtered);
+  const res = await fetch("http://localhost:5000/get-payments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
   });
+
+  const data = await res.json();
+  if (!data.success) return alert("❌ Error loading payments");
+
+  let filtered = data.payments;
+
+  if (selected !== "all") {
+    filtered = data.payments.filter(txn => {
+      if (!txn.date) return false;
+
+      filtered = data.payments.filter(txn => {
+        if (!txn.date) return false;
+
+        // Assuming txn.date is in "DD-MM-YYYY"
+        const parts = txn.date.split("-");
+        if (parts.length !== 3) return false;
+
+        const year = parts[2];
+        const month = parts[1].padStart(2, '0'); // Ensure "07" format
+        const formatted = `${year}-${month}`;   // → "2025-07"
+
+        return formatted === selected;
+      });
+
+    });
+  }
+
+  renderTable(filtered);
+
+  if (filtered.length === 0) {
+    document.querySelector("#paymentTable tbody").innerHTML = `
+      <tr><td colspan="7" style="text-align:center;">No transactions for selected month</td></tr>`;
+  }
+
+});
 
     document.getElementById("paymentHistoryBtn").addEventListener("click", function (e) {
     e.preventDefault();
@@ -470,3 +493,84 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
   loadProfile();
 
 });
+
+/* ─────────────── TARGET TRACKER HANDLING ─────────────── */
+  const editBtn = document.getElementById("edit-target-btn");
+  const deleteBtn = document.getElementById("delete-target-btn");
+  const saveBtn = document.getElementById("save-target-btn");
+  const form = document.getElementById("edit-target-form");
+
+  // Elements for UI rendering
+  const titleEl = document.getElementById("target-title");
+  const amountEl = document.getElementById("target-amount");
+  const savedEl = document.getElementById("target-saved");
+  const deadlineEl = document.getElementById("target-deadline");
+  const progressFill = document.getElementById("savings-progress-fill");
+  const progressText = document.getElementById("savings-progress-text");
+
+  // Deadline alert
+  const alertBox = document.getElementById("deadline-alert");
+  const alertTitle = document.getElementById("alert-title");
+  const alertDays = document.getElementById("alert-days");
+
+  // Edit Target → Show Form
+  editBtn.addEventListener("click", () => {
+    form.style.display = form.style.display === "none" ? "block" : "none";
+
+    // Pre-fill form with current values
+    document.getElementById("edit-title").value = titleEl.textContent;
+    document.getElementById("edit-amount").value = amountEl.textContent;
+    document.getElementById("edit-saved").value = savedEl.textContent;
+    
+    // Convert "10 Oct 2025" to YYYY-MM-DD
+    const parsedDate = new Date(deadlineEl.textContent);
+    document.getElementById("edit-deadline").value = parsedDate.toISOString().split("T")[0];
+  });
+
+  // Save Target → Update UI
+  saveBtn.addEventListener("click", () => {
+    const newTitle = document.getElementById("edit-title").value;
+    const newAmount = parseFloat(document.getElementById("edit-amount").value);
+    const newSaved = parseFloat(document.getElementById("edit-saved").value);
+    const newDeadline = document.getElementById("edit-deadline").value;
+
+    if (!newTitle || isNaN(newAmount) || isNaN(newSaved) || !newDeadline) {
+      alert("❌ Please fill all fields correctly.");
+      return;
+    }
+
+    // Update UI
+    titleEl.textContent = newTitle;
+    amountEl.textContent = newAmount.toLocaleString();
+    savedEl.textContent = newSaved.toLocaleString();
+    deadlineEl.textContent = new Date(newDeadline).toLocaleDateString("en-IN", {
+      day: "2-digit", month: "short", year: "numeric"
+    });
+
+    // Update progress bar
+    const pct = Math.min(100, (newSaved / newAmount) * 100).toFixed(0);
+    progressFill.style.width = `${pct}%`;
+    progressText.textContent = `${pct}% completed`;
+
+    // Update deadline alert
+    const dueDate = new Date(newDeadline);
+    const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 5 && daysLeft >= 0) {
+      alertTitle.textContent = newTitle;
+      alertDays.textContent = daysLeft;
+      alertBox.style.display = "block";
+    } else {
+      alertBox.style.display = "none";
+    }
+
+    form.style.display = "none";
+  });
+
+  // Delete Target (stub)
+  deleteBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to delete this target?")) {
+      alert("🚧 Delete functionality coming soon.");
+    }
+  });
+
+})
