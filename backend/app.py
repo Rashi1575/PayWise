@@ -176,7 +176,7 @@ def make_payment():
         amount = float(data["amount"])
         desc = data["description"]
         method = data["payment_method"]
-        timestamp = str(datetime.datetime.utcnow())
+        timestamp = datetime.datetime.utcnow().date().isoformat()
 
         # --- Fetch sender and receiver from Supabase ---
         sender_res = supabase.table("users").select("*").eq("username", sender_username).execute()
@@ -215,7 +215,12 @@ def make_payment():
         # --- Fraud detection ---
         is_fraud = amount > 10000
 
-        txn_id = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
+        # txn_id = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
+        # Generate unique transaction IDs
+        txn_id_base = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
+        txn_id_sender = txn_id_base + "_S"
+        txn_id_receiver = txn_id_base + "_R"
+
         new_sender_balance = sender["balance"] - amount
         new_receiver_balance = receiver["balance"] + amount
 
@@ -227,7 +232,7 @@ def make_payment():
                 "description": desc,
                 "payment_method": method,
                 "date": timestamp,
-                "transaction_id": txn_id,
+                "transaction_id": txn_id_base,
                 "is_fraud": True,
                 "closing_balance": sender["balance"]  # balance remains unchanged
             }).execute()
@@ -242,18 +247,35 @@ def make_payment():
         supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender_username).execute()
         supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver_username).execute()
 
-        # --- Insert transaction ---
+        # Insert sender's transaction (withdrawal)
         supabase.table("payments").insert({
             "username": sender_username,
             "withdrawal": amount,
+            "deposit": None,
             "category": category,
             "description": desc,
             "payment_method": method,
             "date": timestamp,
-            "transaction_id": txn_id,
+            "transaction_id": txn_id_sender,
             "is_fraud": False,
             "closing_balance": new_sender_balance
         }).execute()
+
+        # Insert receiver's transaction (deposit)
+        supabase.table("payments").insert({
+            "username": receiver_username,
+            "withdrawal": None,
+            "deposit": amount,
+            "category": category,
+            "description": f"Received from {sender_username}: {desc}",
+            "payment_method": method,
+            "date": timestamp,
+            "transaction_id": txn_id_receiver,
+            "is_fraud": False,
+            "closing_balance": new_receiver_balance
+        }).execute()
+
+
 
         return jsonify({
             "success": True,
