@@ -10,6 +10,10 @@ import supabase
 from supabase import create_client
 import pandas as pd
 import requests
+# Rashi
+from supabase import create_client, Client
+from datetime import datetime
+import uuid
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,10 +23,15 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
 TABLE = os.getenv("SUPABASE_USERS_TABLE", "users")
-
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY) #Rashi
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend to connect
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+# CORS(app)   Allow frontend to connect
+
+def generate_transaction_id(username, prefix="TXN"):
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]  # till ms
+    return f"{prefix}{timestamp}_{username.upper()[0]}"
 
 # Signup Route
 @app.route('/signup', methods=['POST'])
@@ -165,128 +174,189 @@ def update_profile():
 expense_clf = joblib.load("expense_classifier_model.pkl")
 vectorizer = joblib.load("vectorizer.pkl")  # If you saved it separately
 fraud_model = joblib.load("fraud_model.pkl")
-@app.route("/make-payment", methods=["POST"])
 
+# Rashi
+@app.route('/budgets', methods=['GET', 'POST', 'OPTIONS'])
+def budgets():
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    if request.method == 'GET':
+        username = request.args.get('username')
+        try:
+            response = supabase.table("budgets").select("*").eq("username", username).execute()
+            data = response.data
+            return jsonify({"success": True, "data": data})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+
+    if request.method == 'POST':
+        try:
+            body = request.get_json()
+            username = body.get("username")
+            category = body.get("category")
+            budget_amount = body.get("budget_amount")
+
+            if not username or not category or budget_amount is None:
+                print("❌ Missing fields:", body)
+                return jsonify({
+                    "success": False,
+                    "error": "Missing required fields: username, category, or budget_amount"
+                }), 400
+
+            # Check if entry exists
+            existing = supabase.table("budgets").select("id").eq("username", username).eq("category", category).execute()
+
+            if existing.data:
+                # Update
+                budget_id = existing.data[0]['id']
+                response = supabase.table("budgets").update({
+                    "budget_amount": budget_amount
+                }).eq("id", budget_id).execute()
+            else:
+                # Insert
+                response = supabase.table("budgets").insert({
+                    "username": username,
+                    "category": category,
+                    "budget_amount": budget_amount
+                }).execute()
+
+            return jsonify({"success": True, "data": response.data})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+# Rashi
 @app.route("/make-payment", methods=["POST"])
 def make_payment():
     try:
-        data = request.get_json()
-        sender_username = data["sender"]
-        receiver_username = data["receiver"]
-        amount = float(data["amount"])
-        desc = data["description"]
-        method = data["payment_method"]
-        timestamp = datetime.datetime.utcnow().date().isoformat()
+        data = request.get_json(force=True)
+        sender = data.get("sender", "").strip()
+        receiver = data.get("receiver", "").strip()
+        amount = float(data.get("amount", 0))
+        description = data.get("description", "").strip() or "No description"
+        method = data.get("method", "").strip() or "Other"
+        date_today = datetime.now().strftime("%Y-%m-%d")
 
-        # --- Fetch sender and receiver from Supabase ---
-        sender_res = supabase.table("users").select("*").eq("username", sender_username).execute()
-        receiver_res = supabase.table("users").select("*").eq("username", receiver_username).execute()
+        # Safety check
+        if not all([sender, receiver]) or amount <= 0:
+            return jsonify({"success": False, "message": "Missing or invalid fields."}), 400
 
-        if not sender_res.data or not receiver_res.data:
-            return jsonify({"success": False, "error": "Sender or Receiver not found"}), 404
+        # Fetch sender's balance
+        sender_data = supabase.table("payments").select("closing_balance").eq("username", sender).order("date", desc=True).limit(1).execute()
+        sender_balance = sender_data.data[0]["closing_balance"] if sender_data.data else 10000.0
 
-        sender = sender_res.data[0]
-        receiver = receiver_res.data[0]
+        if amount > sender_balance:
+            return jsonify({"success": False, "message": "Insufficient balance."}), 400
 
-        if sender["balance"] < amount:
-            return jsonify({"success": False, "error": "Insufficient balance"}), 400
+        # Deduct from sender
+        new_sender_balance = sender_balance - amount
+        txn_id_sender = "TXN" + datetime.now().strftime("%Y%m%d%H%M%S%f") + "_S"
 
-        # --- Predict category using ML ---
-        cleaned_desc = desc.lower()
-        tfidf = vectorizer.transform([cleaned_desc])
-        category = expense_clf.predict(tfidf)[0]
-
-        CATEGORY_MAP = {
-            "Food": "Food and Grocery",
-            "Food and grocery": "Food and Grocery",
-            "Transport": "Transportation",
-            "Transportation": "Transportation",
-            "Utilities": "Housing and Bills",
-            "Housing": "Housing and Bills",
-            "Bills": "Housing and Bills",
-            "Healthcare": "Healthcare",
-            "Education": "Education",
-            "Shopping": "Shopping",
-            "Savings": "Savings",
-            "Others": "Others"
-        }
-        category = CATEGORY_MAP.get(category, "Others")
-
-        # --- Fraud detection ---
-        is_fraud = amount > 10000
-
-        # txn_id = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
-        # Generate unique transaction IDs
-        txn_id_base = f"TXN{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}"
-        txn_id_sender = txn_id_base + "_S"
-        txn_id_receiver = txn_id_base + "_R"
-
-        new_sender_balance = sender["balance"] - amount
-        new_receiver_balance = receiver["balance"] + amount
-
-        if is_fraud:
-            supabase.table("payments").insert({
-                "username": sender_username,
-                "withdrawal": amount,
-                "category": category,
-                "description": desc,
-                "payment_method": method,
-                "date": timestamp,
-                "transaction_id": txn_id_base,
-                "is_fraud": True,
-                "closing_balance": sender["balance"]  # balance remains unchanged
-            }).execute()
-
-            return jsonify({
-                "success": False,
-                "error": "⚠️ Transaction declined: Amount exceeds the permitted limit of ₹10,000.",
-                "is_fraud": True
-            }), 403
-
-        # --- Update balances ---
-        supabase.table("users").update({"balance": new_sender_balance}).eq("username", sender_username).execute()
-        supabase.table("users").update({"balance": new_receiver_balance}).eq("username", receiver_username).execute()
-
-        # Insert sender's transaction (withdrawal)
         supabase.table("payments").insert({
-            "username": sender_username,
-            "withdrawal": amount,
-            "deposit": None,
-            "category": category,
-            "description": desc,
-            "payment_method": method,
-            "date": timestamp,
             "transaction_id": txn_id_sender,
-            "is_fraud": False,
-            "closing_balance": new_sender_balance
-        }).execute()
-
-        # Insert receiver's transaction (deposit)
-        supabase.table("payments").insert({
-            "username": receiver_username,
-            "withdrawal": None,
-            "deposit": amount,
-            "category": category,
-            "description": f"Received from {sender_username}: {desc}",
+            "username": sender,
+            "category": "Transfer",
+            "description": description,
             "payment_method": method,
-            "date": timestamp,
-            "transaction_id": txn_id_receiver,
             "is_fraud": False,
-            "closing_balance": new_receiver_balance
+            "deposit": None,
+            "withdrawal": amount,
+            "closing_balance": new_sender_balance,
+            "date": date_today
         }).execute()
 
+        # Fetch receiver's balance
+        receiver_data = supabase.table("payments").select("closing_balance").eq("username", receiver).order("date", desc=True).limit(1).execute()
+        receiver_balance = receiver_data.data[0]["closing_balance"] if receiver_data.data else 10000.0
+        new_receiver_balance = receiver_balance + amount
+        txn_id_receiver = "TXN" + datetime.now().strftime("%Y%m%d%H%M%S%f") + "_R"
 
-
-        return jsonify({
-            "success": True,
-            "message": "✅ Payment completed successfully.",
-            "category": category,
+        # Credit to receiver
+        supabase.table("payments").insert({
+            "transaction_id": txn_id_receiver,
+            "username": receiver,
+            "category": "Transfer",
+            "description": f"Received from {sender}: {description}",
+            "payment_method": method,
             "is_fraud": False,
-            "receiver": receiver_username
-        })
+            "deposit": amount,
+            "withdrawal": None,
+            "closing_balance": new_receiver_balance,
+            "date": date_today
+        }).execute()
+
+        return jsonify({"success": True, "message": "Payment successful."})
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        print("❌ Payment Error:", str(e))
+        return jsonify({"success": False, "message": "Payment failed. Please try again."}), 500
+
+    
+# Rashi
+@app.route('/targets', methods=['GET', 'POST', 'OPTIONS'])
+def targets():
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    if request.method == 'GET':
+        username = request.args.get('username')
+        try:
+            response = supabase.table("targets").select("*").eq("username", username).execute()
+            return jsonify({"success": True, "data": response.data})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+
+    if request.method == 'POST':
+        data = request.get_json()
+        username     = data["username"]
+        title        = data["title"]
+        target_amt   = data["target_amount"]
+        due_date     = data["due_date"]
+        savings_amt  = data.get("savings", 0)
+
+        # 1) Upsert into the `targets` table (you already have this)
+        existing = supabase.table("targets")\
+            .select("id")\
+            .eq("username", username)\
+            .eq("title", title)\
+            .execute()
+
+        if existing.data:
+            target_id = existing.data[0]["id"]
+            supabase.table("targets").update({
+                "target_amount": target_amt,
+                "due_date": due_date,
+                "savings": savings_amt
+            }).eq("id", target_id).execute()
+        else:
+            supabase.table("targets").insert({
+                "username": username,
+                "title": title,
+                "target_amount": target_amt,
+                "due_date": due_date,
+                "savings": savings_amt
+            }).execute()
+
+        # 2) Now upsert into `savings_targets` so current_savings is kept in that table too
+        #    (this table has username as primary key)
+        existing_st = supabase.table("savings_targets")\
+            .select("username")\
+            .eq("username", username)\
+            .execute()
+
+        if existing_st.data:
+            supabase.table("savings_targets").update({
+                "current_savings": savings_amt,
+                "target_amount": target_amt
+            }).eq("username", username).execute()
+        else:
+            supabase.table("savings_targets").insert({
+                "username": username,
+                "current_savings": savings_amt,
+                "target_amount": target_amt
+            }).execute()
+
+        return jsonify({"success": True})
+
 
 
 @app.route("/get-payments", methods=["POST"])
@@ -336,6 +406,8 @@ def spending_insights():
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    
+
 
 
 if __name__ == '__main__':
