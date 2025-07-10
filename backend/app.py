@@ -10,10 +10,13 @@ import supabase
 from supabase import create_client
 import pandas as pd
 import requests
-# Rashi
 from supabase import create_client, Client
 from datetime import datetime
 import uuid
+from rewards import get_active_rewards
+from rewards import add_reward
+from rewards import suggest_category_coupons
+from rewards import auto_generate_reward
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -406,7 +409,67 @@ def spending_insights():
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/get-rewards", methods=["POST"])
+def get_rewards():
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+
+    try:
+        rewards = get_active_rewards(username)
+        return jsonify({"success": True, "rewards": rewards})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/add-reward", methods=["POST"])
+def add_reward_route():
+    data = request.get_json()
+    username = data.get("username")
+    reward_name = data.get("reward_name")
+    category = data.get("category")
+    expiry_date = data.get("expiry_date")
+
+    if not all([username, reward_name, category, expiry_date]):
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+
+    try:
+        add_reward(username, reward_name, category, expiry_date)
+        return jsonify({"success": True, "message": "Reward added!"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
     
+@app.route("/suggest-rewards", methods=["POST"])
+def suggest_rewards():
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+
+    try:
+        suggestions = suggest_category_coupons(username)
+        return jsonify({"success": True, "suggestions": suggestions})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@app.route("/auto-generate-reward", methods=["POST"])
+def auto_generate_reward_route():
+    data = request.get_json()
+    username = data.get("username")
+    category = data.get("category")
+    trigger_type = data.get("trigger_type", "spend")
+
+    if not username or not category:
+        return jsonify({"success": False, "error": "Missing username or category"}), 400
+
+    try:
+        coupon = auto_generate_reward(username, category, trigger_type)
+        return jsonify({"success": True, "coupon_code": coupon})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 
