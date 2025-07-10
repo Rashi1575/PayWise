@@ -144,26 +144,6 @@ payMethodSelect.dispatchEvent(new Event("change"));
     els.forEach(el => el && (el.style.display = "block"));
   };
 
-  const ctx = document.getElementById('spendingChart').getContext('2d');
-  spendingChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: [], // Initially empty
-      datasets: [{
-        data: [],
-        backgroundColor: []
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false
-        }
-      }
-    }
-  });
-
 
   // Make Payment link
   const makePaymentLink = document.getElementById("makePaymentLink");
@@ -321,24 +301,16 @@ payMethodSelect.dispatchEvent(new Event("change"));
   let filtered = data.payments;
 
   if (selected !== "all") {
+    // Rashi
     filtered = data.payments.filter(txn => {
       if (!txn.date) return false;
-
-      filtered = data.payments.filter(txn => {
-        if (!txn.date) return false;
-
-        // Assuming txn.date is in "DD-MM-YYYY"
-        const parts = txn.date.split("-");
-        if (parts.length !== 3) return false;
-
-        const year = parts[2];
-        const month = parts[1].padStart(2, '0'); // Ensure "07" format
-        const formatted = `${year}-${month}`;   // → "2025-07"
-
-        return formatted === selected;
-      });
-
+      const parts = txn.date.split("-");
+      if (parts.length !== 3) return false;
+      const year = parts[2];
+      const month = parts[1].padStart(2, '0');
+      return `${year}-${month}` === selected;
     });
+
   }
 
   renderTable(filtered);
@@ -416,62 +388,6 @@ payMethodSelect.dispatchEvent(new Event("change"));
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileData);
 
 
-
-  document.getElementById("submitPayment")?.addEventListener("click", async () => {
-    const receiver = document.getElementById("receiverUsername").value;
-    const amount = document.getElementById("payAmount").value.trim();
-    const desc = document.getElementById("payDesc").value;
-    const method = document.getElementById("payMethod").value;
-    const sender = localStorage.getItem("username");
-
-    const payStatus = document.getElementById("payStatus");
-    const loader = document.getElementById("paymentLoader");
-
-    // Validate inputs
-    if (!receiver || !amount || !desc || isNaN(amount) || amount <= 0) {
-      alert("Please fill all fields correctly.");
-      return;
-    }
-
-    // Show loader
-    payStatus.textContent = "";
-    loader.style.display = "block";
-
-    // Simulate fake processing delay
-    setTimeout(async () => {
-      try {
-        const res = await fetch("http://localhost:5000/make-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sender,
-            receiver,
-            amount: parseFloat(amount),
-            description: desc,
-            payment_method: method
-          })
-        });
-
-        const data = await res.json();
-        loader.style.display = "none";
-
-        if (data.success) {
-          payStatus.textContent = "✅ Transaction successful!";
-          document.getElementById("receiverUsername").value = "";
-          document.getElementById("payAmount").value = "";
-          document.getElementById("payDesc").value = "";
-          document.getElementById("paymentDetailsExtra").innerHTML = "";
-        } else {
-          payStatus.textContent = `❌ Error: ${data.error}`;
-        }
-      } catch (err) {
-        loader.style.display = "none";
-        payStatus.textContent = "❌ Server error: " + err.message;
-      }
-    }, 2000);
-  });
-
-
   async function loadPayments() {
   const username = localStorage.getItem("username");
   const res = await fetch("http://localhost:5000/get-payments", {
@@ -484,15 +400,22 @@ payMethodSelect.dispatchEvent(new Event("change"));
   if (data.success) renderTable(data.payments);
 }
 
+// Rashi
 document.getElementById("paymentHistoryBtn").addEventListener("click", async (e) => {
   e.preventDefault();
   document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
   const section = document.getElementById("payment-history-section");
   section.style.display = "block";
-  await loadPayments();
-  loadProfile();
-
+  try {
+    await loadPayments();            // fetch data from backend
+    // renderTable(data.payments);     
+  } catch (err) {
+    console.error("Failed to load payments:", err);
+  }
 });
+
+
+// });
 
 /* ─────────────── TARGET TRACKER HANDLING ─────────────── */
   const editBtn = document.getElementById("edit-target-btn");
@@ -564,6 +487,28 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
     }
 
     form.style.display = "none";
+    // Rashi
+    // Save to backend
+    fetch("http://localhost:5000/targets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: localStorage.getItem("username"),
+        title: newTitle,
+        target_amount: newAmount,
+        due_date: newDeadline,
+        savings: newSaved
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("🎯 Target saved to backend!");
+      } else {
+        alert("❌ Failed to save target: " + data.error);
+      }
+    });
+
   });
 
   // Delete Target (stub)
@@ -573,4 +518,110 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
     }
   });
 
+  // Rashi
+  document.getElementById("submitPayment").addEventListener("click", () => {
+    const sender = localStorage.getItem("username");
+    const receiver = document.getElementById("receiverUsername").value;
+    const amount = parseFloat(document.getElementById("payAmount").value);
+    const description = document.getElementById("payDesc").value;
+    const method = document.getElementById("payMethod").value;
+
+    if (!sender || !receiver || !amount || !description) {
+      document.getElementById("payStatus").textContent = "Please fill all fields.";
+      return;
+    }
+
+    document.getElementById("paymentLoader").style.display = "block";
+
+    fetch("http://localhost:5000/make-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sender,
+        receiver,
+        amount,
+        description,
+        method
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("paymentLoader").style.display = "none";
+      if (data.success) {
+        document.getElementById("payStatus").textContent = "✅ Payment successful!";
+      } else {
+        document.getElementById("payStatus").textContent = "❌ Failed: " + data.message;
+      }
+    })
+    .catch((err) => {
+      document.getElementById("paymentLoader").style.display = "none";
+      document.getElementById("payStatus").textContent = "⚠ Error processing payment.";
+      console.error(err);
+    });
+  });
+
+  document.getElementById("saveBudget").addEventListener("click", () => {
+    const username = localStorage.getItem("username");
+    const category = document.getElementById("category").value;
+    const amount = parseFloat(document.getElementById("categoryBudget").value);
+
+    if (!username || !category || isNaN(amount)) {
+      alert("Please fill category and amount.");
+      return;
+    }
+
+    fetch("http://localhost:5000/budgets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        category,
+        budget_amount: amount
+      })
+    })
+
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Budget saved successfully.");
+      } else {
+        alert("Failed to save budget.");
+      }
+    });
+  });
+  // Rashi
+  loadProfile();
+  // loadPayments();
+  loadSpendingInsights();
+  loadTargets(); 
+  
 })
+// DOM ends
+// OUTSIDE the DOMContentLoaded block
+// Rashi
+async function loadTargets() {
+  const username = localStorage.getItem("username");
+  const res = await fetch("http://localhost:5000/targets?username=" + username);
+  const data = await res.json();
+  if (!data.success) return;
+
+  const t = data.data[0];
+  if (!t) return;
+
+  document.getElementById("target-title").textContent = t.title;
+  document.getElementById("target-amount").textContent = t.target_amount;
+  document.getElementById("target-saved").textContent = t.savings;
+  document.getElementById("target-deadline").textContent = new Date(t.due_date).toLocaleDateString("en-IN");
+
+  const pct = Math.min(100, (t.savings / t.target_amount) * 100).toFixed(0);
+  document.getElementById("savings-progress-fill").style.width = `${pct}%`;
+  document.getElementById("savings-progress-text").textContent = `${pct}% completed`;
+
+  const dueDate = new Date(t.due_date);
+  const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+  if (daysLeft <= 5 && daysLeft >= 0) {
+    document.getElementById("alert-title").textContent = t.title;
+    document.getElementById("alert-days").textContent = daysLeft;
+    document.getElementById("deadline-alert").style.display = "block";
+  }
+}
