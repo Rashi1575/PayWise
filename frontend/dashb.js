@@ -1,4 +1,3 @@
-
 function loadProfile() {
   const username = localStorage.getItem("username");
   if (!username) return;
@@ -18,7 +17,6 @@ function loadProfile() {
       }
     });
 }
-
 
 function renderTable(data) {
   const tbody = document.querySelector("#paymentTable tbody");
@@ -45,7 +43,7 @@ function renderTable(data) {
     tbody.appendChild(row);
   });
 }
-// NEW
+
 function getSuggestions(category) {
   const map = {
     "Food and Grocery": "Dining, Fast Food",
@@ -226,6 +224,7 @@ payMethodSelect.dispatchEvent(new Event("change"));
     rewardsLink.addEventListener("click", (e) => {
       e.preventDefault();
       showOnly(rewardsSection);
+      loadRewards();
 
       const categoryData = {
         labels: ["Food", "Transport", "Utilities", "Shopping", "Others"],
@@ -236,12 +235,6 @@ payMethodSelect.dispatchEvent(new Event("change"));
       const topCategory = categoryData.labels[maxIndex];
       document.getElementById("highestCategory").textContent = topCategory;
     });
-  }
-
-
-  function copyReferral() {
-  navigator.clipboard.writeText("PAYWISE123");
-  alert("Referral code copied!");
   }
 
   /* ───────────────── CHART #2 (Bar) ───────────────── */
@@ -414,8 +407,90 @@ document.getElementById("paymentHistoryBtn").addEventListener("click", async (e)
   }
 });
 
+/* ───────────────────── REWARDS ───────────────────── */
+// Get logged-in username from either localStorage or sessionStorage
+const username = localStorage.getItem("username") || sessionStorage.getItem("username");
 
-// });
+// Only proceed if username is present
+if (username) {
+  // Fetch active rewards
+  function loadRewards() {
+    const username = localStorage.getItem("username");
+    if (!username) return;
+    fetch("http://localhost:5000/get-rewards", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const list = document.getElementById("reward-list");
+          list.innerHTML = "";
+
+          if (data.rewards.length === 0) {
+            list.innerHTML = `<li>No active rewards found.</li>`;
+            return;
+        }
+        data.rewards.forEach(reward => {
+            const [name, category, expiry] = reward;
+            const li = document.createElement("li");
+            li.innerHTML = `🎁 <strong>${name}</strong> — ${category} (expires on ${expiry})`;
+            list.appendChild(li);
+        });
+      }   else {
+          console.error(data.error);
+      }
+    });
+}
+
+// Add a new reward dynamically (example only!)
+  fetch("/add-reward", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      reward_name: "₹50 Cashback",
+      category: "Food",
+      expiry_date: "2025-12-31",
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("✅ Reward Added:", data);
+    });
+// Suggest rewards for the user
+  fetch("/suggest-rewards", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        console.log("💡 Suggestions:", data.suggestions);
+      } else {
+        console.error("❌ Suggestion error:", data.error);
+      }
+    });
+
+// Auto-generate a reward dynamically
+  fetch("/auto-generate-reward", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      category: "Food",
+      trigger_type: "spend",
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("🎫 Auto-Generated Reward:", data);
+    });
+} else {
+  console.error("⚠️ No logged-in user found. Cannot load rewards.");
+}
 
 /* ─────────────── TARGET TRACKER HANDLING ─────────────── */
   const editBtn = document.getElementById("edit-target-btn");
